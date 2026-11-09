@@ -30,6 +30,15 @@ describe("Navigation", () => {
     );
   });
 
+  it("displays a link labeled Favorites to the route /favorites", () => {
+    renderNavigation("/");
+
+    expect(screen.getByRole("link", { name: "Favorites" })).toHaveAttribute(
+      "href",
+      "/favorites"
+    );
+  });
+
   it("highlights only the Spotlight link on the route /", () => {
     renderNavigation("/");
 
