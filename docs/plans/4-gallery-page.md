@@ -33,7 +33,7 @@ Tests use Vitest and React Testing Library. The tests are written first.
 - New: `src/components/ArtPieceList.tsx` (a `<ul>` of previews).
 - New: `src/components/ArtPiecePreview.tsx` (`<li>` with image, title and artist).
 - Change: `src/App.tsx`: fetch once with `useSWR`, loading and error states, a `Route` for `/art-pieces`.
-- Change: `src/styles.css`: minimal styles for the list and cards.
+- No change to `src/styles.css`: `.art-list` and `.art-piece` already exist there.
 - New tests next to the source: `fetcher.test.ts`, `ArtPieceList.test.tsx`, `ArtPiecePreview.test.tsx`, `App.test.tsx`.
 - New: `docs/plans/4-gallery-page.md` (this plan).
 
