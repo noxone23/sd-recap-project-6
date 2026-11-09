@@ -20,6 +20,10 @@ function renderDetails() {
         artPiece={artPiece}
         isFavorite={false}
         onToggleFavorite={() => {}}
+        comments={[
+          { text: "Beautiful colors", date: "2026-11-09T10:15:00.000Z" },
+        ]}
+        onAddComment={() => {}}
       />
     </MemoryRouter>
   );
@@ -56,6 +60,26 @@ describe("ArtPieceDetails", () => {
 
     expect(
       screen.getByRole("button", { name: "Favorite The Harvesters" })
+    ).toBeInTheDocument();
+  });
+
+  it("displays the comments section with the comments", () => {
+    renderDetails();
+
+    expect(
+      screen.getByRole("region", { name: "Comments" })
+    ).toBeInTheDocument();
+    expect(screen.getByText("Beautiful colors")).toBeInTheDocument();
+  });
+
+  it("displays the comment form", () => {
+    renderDetails();
+
+    expect(
+      screen.getByRole("textbox", { name: "Comment" })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Add comment" })
     ).toBeInTheDocument();
   });
 

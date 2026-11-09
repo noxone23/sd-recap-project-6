@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { SWRConfig } from "swr";
@@ -227,6 +227,60 @@ describe("App", () => {
     await user.click(await screen.findByRole("link", { name: "Back" }));
 
     expect(screen.getAllByRole("listitem")).toHaveLength(2);
+  });
+
+  it("adds a comment to the art piece on the details page", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces/the-harvesters");
+
+    await user.type(
+      await screen.findByRole("textbox", { name: "Comment" }),
+      "Beautiful colors"
+    );
+    await user.click(screen.getByRole("button", { name: "Add comment" }));
+
+    const comments = screen.getByRole("region", { name: "Comments" });
+    expect(within(comments).getAllByRole("listitem")).toHaveLength(1);
+    expect(within(comments).getByText("Beautiful colors")).toBeInTheDocument();
+    expect(comments.querySelector("time")).toBeInTheDocument();
+  });
+
+  it("adds a comment only to its own art piece", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces/the-harvesters");
+
+    await user.type(
+      await screen.findByRole("textbox", { name: "Comment" }),
+      "Beautiful colors"
+    );
+    await user.click(screen.getByRole("button", { name: "Add comment" }));
+    await user.click(screen.getByRole("link", { name: "Back" }));
+    await user.click(
+      screen.getByRole("link", { name: /Wheat Field with Cypresses/ })
+    );
+
+    expect(screen.queryByText("Beautiful colors")).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole("link", { name: "Back" }));
+    await user.click(screen.getByRole("link", { name: /The Harvesters/ }));
+
+    expect(screen.getByText("Beautiful colors")).toBeInTheDocument();
+  });
+
+  it("does not add an empty comment", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces/the-harvesters");
+
+    await user.type(
+      await screen.findByRole("textbox", { name: "Comment" }),
+      "   "
+    );
+    await user.click(screen.getByRole("button", { name: "Add comment" }));
+
+    expect(screen.queryAllByRole("listitem")).toHaveLength(0);
   });
 
   it("shows Art piece not found for an unknown slug", async () => {
