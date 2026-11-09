@@ -16,7 +16,11 @@ const artPiece: ArtPiece = {
 function renderPreview() {
   return render(
     <MemoryRouter>
-      <ArtPiecePreview artPiece={artPiece} />
+      <ArtPiecePreview
+        artPiece={artPiece}
+        isFavorite={false}
+        onToggleFavorite={() => {}}
+      />
     </MemoryRouter>
   );
 }
@@ -39,6 +43,14 @@ describe("ArtPiecePreview", () => {
     renderPreview();
 
     expect(screen.getByText("Pieter Bruegel the Elder")).toBeInTheDocument();
+  });
+
+  it("displays the favorite button", () => {
+    renderPreview();
+
+    expect(
+      screen.getByRole("button", { name: "Favorite The Harvesters" })
+    ).toBeInTheDocument();
   });
 
   it("links to the details page of the art piece", () => {

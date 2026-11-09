@@ -182,6 +182,106 @@ describe("App", () => {
     expect(await screen.findByText("Art piece not found")).toBeInTheDocument();
   });
 
+  it("marks an art piece as favorite after clicking its favorite button", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces");
+
+    const button = await screen.findByRole("button", {
+      name: "Favorite The Harvesters",
+    });
+    expect(button).toHaveAttribute("aria-pressed", "false");
+
+    await user.click(button);
+
+    expect(button).toHaveAttribute("aria-pressed", "true");
+    expect(
+      screen.getByRole("button", {
+        name: "Favorite Wheat Field with Cypresses",
+      })
+    ).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("removes the favorite after clicking the favorite button again", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces");
+
+    const button = await screen.findByRole("button", {
+      name: "Favorite The Harvesters",
+    });
+    await user.click(button);
+    await user.click(button);
+
+    expect(button).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("keeps the favorite status when navigating to the details page", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces");
+
+    await user.click(
+      await screen.findByRole("button", { name: "Favorite The Harvesters" })
+    );
+    await user.click(screen.getByRole("link", { name: /The Harvesters/ }));
+
+    expect(
+      screen.getByRole("button", { name: "Favorite The Harvesters" })
+    ).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("toggles the favorite on the spotlight", async () => {
+    mockRandom(0);
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/");
+
+    const button = await screen.findByRole("button", {
+      name: "Favorite The Harvesters",
+    });
+    expect(button).toHaveAttribute("aria-pressed", "false");
+
+    await user.click(button);
+    expect(button).toHaveAttribute("aria-pressed", "true");
+
+    await user.click(button);
+    expect(button).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("toggles the favorite on the details page", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces/the-harvesters");
+
+    const button = await screen.findByRole("button", {
+      name: "Favorite The Harvesters",
+    });
+    expect(button).toHaveAttribute("aria-pressed", "false");
+
+    await user.click(button);
+    expect(button).toHaveAttribute("aria-pressed", "true");
+
+    await user.click(button);
+    expect(button).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("keeps the favorite status when navigating to the spotlight", async () => {
+    mockRandom(0);
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces");
+
+    await user.click(
+      await screen.findByRole("button", { name: "Favorite The Harvesters" })
+    );
+    await user.click(screen.getByRole("link", { name: "Spotlight" }));
+
+    expect(
+      screen.getByRole("button", { name: "Favorite The Harvesters" })
+    ).toHaveAttribute("aria-pressed", "true");
+  });
+
   it.each(["/", "/art-pieces", "/does-not-exist"])(
     "renders the navigation exactly once on %s",
     async (path) => {
