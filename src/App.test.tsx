@@ -14,6 +14,7 @@ const artPieces: ArtPiece[] = [
     imageSource: "https://example.com/the-harvesters.jpg",
     year: "1565",
     genre: "Renaissance",
+    colors: ["#37412E", "#8D7332"],
   },
   {
     slug: "wheat-field-with-cypresses",
@@ -22,6 +23,7 @@ const artPieces: ArtPiece[] = [
     imageSource: "https://example.com/wheat-field-with-cypresses.jpg",
     year: "1889",
     genre: "Post-Impressionism",
+    colors: ["#112233", "#445566", "#778899"],
   },
 ];
 
@@ -205,6 +207,19 @@ describe("App", () => {
     expect(screen.getAllByRole("img")).toHaveLength(1);
   });
 
+  it("shows the color palette of the art piece on the details page", async () => {
+    mockArtPieces();
+
+    renderApp("/art-pieces/wheat-field-with-cypresses");
+
+    const palette = await screen.findByRole("list", { name: "Color palette" });
+    const items = within(palette).getAllByRole("listitem");
+    expect(items).toHaveLength(3);
+    expect(items[0]).toHaveStyle({ backgroundColor: "#112233" });
+    expect(items[1]).toHaveStyle({ backgroundColor: "#445566" });
+    expect(items[2]).toHaveStyle({ backgroundColor: "#778899" });
+  });
+
   it("shows the details after clicking an art piece in the list", async () => {
     mockArtPieces();
     const user = userEvent.setup();
@@ -216,7 +231,7 @@ describe("App", () => {
 
     expect(screen.getByText("1889")).toBeInTheDocument();
     expect(screen.getByText("Post-Impressionism")).toBeInTheDocument();
-    expect(screen.queryByRole("list")).not.toBeInTheDocument();
+    expect(screen.queryByText("The Harvesters")).not.toBeInTheDocument();
   });
 
   it("shows the list after clicking Back on the details page", async () => {
@@ -306,7 +321,11 @@ describe("App", () => {
     );
     await user.click(screen.getByRole("button", { name: "Add comment" }));
 
-    expect(screen.queryAllByRole("listitem")).toHaveLength(0);
+    expect(
+      within(screen.getByRole("region", { name: "Comments" })).queryAllByRole(
+        "listitem"
+      )
+    ).toHaveLength(0);
   });
 
   it("shows Art piece not found for an unknown slug", async () => {

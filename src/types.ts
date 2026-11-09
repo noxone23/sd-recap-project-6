@@ -5,6 +5,7 @@ export interface ArtPiece {
   imageSource: string;
   year: string;
   genre: string;
+  colors: string[];
 }
 
 export interface ArtPieceComment {
