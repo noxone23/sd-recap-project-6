@@ -9,6 +9,7 @@ const artPieces: ArtPiece[] = [
     imageSource: "https://example.com/the-harvesters.jpg",
     year: "1565",
     genre: "Renaissance",
+    colors: ["#37412E", "#8D7332"],
   },
   {
     slug: "wheat-field-with-cypresses",
@@ -17,6 +18,7 @@ const artPieces: ArtPiece[] = [
     imageSource: "https://example.com/wheat-field-with-cypresses.jpg",
     year: "1889",
     genre: "Post-Impressionism",
+    colors: ["#37412E", "#8D7332"],
   },
   {
     slug: "the-night-watch",
@@ -25,6 +27,7 @@ const artPieces: ArtPiece[] = [
     imageSource: "https://example.com/the-night-watch.jpg",
     year: "1642",
     genre: "Baroque",
+    colors: ["#37412E", "#8D7332"],
   },
 ];
 

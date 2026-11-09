@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 
 import type { ArtPiece } from "../types";
@@ -11,6 +11,7 @@ const artPiece: ArtPiece = {
   imageSource: "https://example.com/the-harvesters.jpg",
   year: "1565",
   genre: "Renaissance",
+  colors: ["#37412E", "#8D7332"],
 };
 
 function renderDetails() {
@@ -61,6 +62,15 @@ describe("ArtPieceDetails", () => {
     expect(
       screen.getByRole("button", { name: "Favorite The Harvesters" })
     ).toBeInTheDocument();
+  });
+
+  it("displays the color palette with the colors of the art piece", () => {
+    renderDetails();
+
+    const palette = screen.getByRole("list", { name: "Color palette" });
+    expect(within(palette).getAllByRole("listitem")).toHaveLength(
+      artPiece.colors.length
+    );
   });
 
   it("displays the comments section with the comments", () => {
