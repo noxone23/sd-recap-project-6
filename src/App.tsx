@@ -9,7 +9,7 @@ import Navigation from "./components/Navigation";
 import Spotlight from "./components/Spotlight";
 import { fetcher } from "./fetcher";
 import "./styles.css";
-import type { ArtPiece, ArtPieceInfo } from "./types";
+import type { ArtPiece, ArtPieceComment, ArtPieceInfo } from "./types";
 
 const API_URL = "https://example-apis.vercel.app/api/art";
 
@@ -17,12 +17,16 @@ interface ArtPieceDetailsRouteProps {
   artPieces: ArtPiece[];
   isFavorite: (slug: string) => boolean;
   onToggleFavorite: (slug: string) => void;
+  getComments: (slug: string) => ArtPieceComment[];
+  onAddComment: (slug: string, text: string) => void;
 }
 
 function ArtPieceDetailsRoute({
   artPieces,
   isFavorite,
   onToggleFavorite,
+  getComments,
+  onAddComment,
 }: ArtPieceDetailsRouteProps) {
   const { slug } = useParams();
   const artPiece = artPieces.find((piece) => piece.slug === slug);
@@ -36,6 +40,8 @@ function ArtPieceDetailsRoute({
       artPiece={artPiece}
       isFavorite={isFavorite(artPiece.slug)}
       onToggleFavorite={() => onToggleFavorite(artPiece.slug)}
+      comments={getComments(artPiece.slug)}
+      onAddComment={(text) => onAddComment(artPiece.slug, text)}
     />
   );
 }
@@ -60,7 +66,25 @@ export default function App() {
               ? { ...info, isFavorite: !info.isFavorite }
               : info
           )
-        : [...current, { slug, isFavorite: true }]
+        : [...current, { slug, isFavorite: true, comments: [] }]
+    );
+  }
+
+  function getComments(slug: string) {
+    return artPieceInfo.find((info) => info.slug === slug)?.comments ?? [];
+  }
+
+  function addComment(slug: string, text: string) {
+    const comment = { text, date: new Date().toISOString() };
+
+    setArtPieceInfo((current) =>
+      current.some((info) => info.slug === slug)
+        ? current.map((info) =>
+            info.slug === slug
+              ? { ...info, comments: [...info.comments, comment] }
+              : info
+          )
+        : [...current, { slug, isFavorite: false, comments: [comment] }]
     );
   }
 
@@ -104,6 +128,8 @@ export default function App() {
               artPieces={artPieces}
               isFavorite={isFavorite}
               onToggleFavorite={toggleFavorite}
+              getComments={getComments}
+              onAddComment={addComment}
             />
           }
         />
