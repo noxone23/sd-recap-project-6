@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { SWRConfig } from "swr";
 
@@ -35,6 +36,13 @@ function mockRandom(fraction: number) {
     (array as Uint32Array)[0] = Math.floor(fraction * 2 ** 32);
     return array;
   });
+}
+
+function mockArtPieces() {
+  vi.stubGlobal(
+    "fetch",
+    vi.fn().mockResolvedValue({ ok: true, json: async () => artPieces })
+  );
 }
 
 afterEach(() => {
@@ -91,5 +99,71 @@ describe("App", () => {
     expect(
       await screen.findByText("Failed to load art pieces.")
     ).toBeInTheDocument();
+  });
+
+  it("shows the spotlight after clicking Spotlight", async () => {
+    mockRandom(0.999);
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces");
+
+    await user.click(await screen.findByRole("link", { name: "Spotlight" }));
+
+    expect(screen.getAllByRole("img")).toHaveLength(1);
+    expect(screen.queryByRole("list")).not.toBeInTheDocument();
+  });
+
+  it("shows the gallery after clicking Gallery", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/");
+
+    await user.click(await screen.findByRole("link", { name: "Gallery" }));
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+    expect(screen.getAllByRole("img")).toHaveLength(2);
+  });
+
+  it("shows Page not found for an unknown URL", async () => {
+    mockArtPieces();
+
+    renderApp("/does-not-exist");
+
+    expect(await screen.findByText("Page not found")).toBeInTheDocument();
+  });
+
+  it.each(["/", "/art-pieces", "/does-not-exist"])(
+    "renders the navigation exactly once on %s",
+    async (path) => {
+      mockArtPieces();
+
+      renderApp(path);
+
+      await screen.findByRole("heading", { name: "Art Gallery" });
+      expect(screen.getAllByRole("navigation")).toHaveLength(1);
+    }
+  );
+
+  it("shows the navigation while the art pieces are loading", () => {
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(new Promise(() => {})));
+
+    renderApp("/art-pieces");
+
+    expect(screen.getByRole("navigation")).toBeInTheDocument();
+    expect(screen.getByText("Loading...")).toBeInTheDocument();
+  });
+
+  it("shows the navigation when loading the art pieces fails", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: false, status: 500 })
+    );
+
+    renderApp("/art-pieces");
+
+    expect(
+      await screen.findByText("Failed to load art pieces.")
+    ).toBeInTheDocument();
+    expect(screen.getByRole("navigation")).toBeInTheDocument();
   });
 });
