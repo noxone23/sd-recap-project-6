@@ -128,6 +128,61 @@ describe("App", () => {
     expect(screen.getAllByRole("img")).toHaveLength(2);
   });
 
+  it("shows the favorites page after clicking Favorites", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/");
+
+    await user.click(await screen.findByRole("link", { name: "Favorites" }));
+
+    expect(screen.getByText("No favorites yet.")).toBeInTheDocument();
+    expect(screen.queryByRole("list")).not.toBeInTheDocument();
+  });
+
+  it("lists only the favorite art pieces on the favorites page", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces");
+
+    await user.click(
+      await screen.findByRole("button", {
+        name: "Favorite Wheat Field with Cypresses",
+      })
+    );
+    await user.click(screen.getByRole("link", { name: "Favorites" }));
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+    expect(
+      screen.getByRole("img", { name: "Wheat Field with Cypresses" })
+    ).toBeInTheDocument();
+    expect(screen.getByText("Wheat Field with Cypresses")).toBeInTheDocument();
+    expect(screen.getByText("Vincent van Gogh")).toBeInTheDocument();
+    expect(screen.queryByText("The Harvesters")).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", {
+        name: "Favorite Wheat Field with Cypresses",
+      })
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(screen.queryByText("No favorites yet.")).not.toBeInTheDocument();
+  });
+
+  it("removes an art piece from the favorites page after clicking its favorite button", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces");
+
+    await user.click(
+      await screen.findByRole("button", { name: "Favorite The Harvesters" })
+    );
+    await user.click(screen.getByRole("link", { name: "Favorites" }));
+    await user.click(
+      screen.getByRole("button", { name: "Favorite The Harvesters" })
+    );
+
+    expect(screen.queryByText("The Harvesters")).not.toBeInTheDocument();
+    expect(screen.getByText("No favorites yet.")).toBeInTheDocument();
+  });
+
   it("shows Page not found for an unknown URL", async () => {
     mockArtPieces();
 

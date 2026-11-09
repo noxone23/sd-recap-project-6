@@ -71,6 +71,10 @@ export default function App() {
   } else if (error || !artPieces) {
     content = <p>Failed to load art pieces.</p>;
   } else {
+    const favoriteArtPieces = artPieces.filter((piece) =>
+      isFavorite(piece.slug)
+    );
+
     content = (
       <Routes>
         <Route
@@ -101,6 +105,20 @@ export default function App() {
               isFavorite={isFavorite}
               onToggleFavorite={toggleFavorite}
             />
+          }
+        />
+        <Route
+          path="/favorites"
+          element={
+            favoriteArtPieces.length === 0 ? (
+              <p>No favorites yet.</p>
+            ) : (
+              <ArtPieceList
+                artPieces={favoriteArtPieces}
+                isFavorite={isFavorite}
+                onToggleFavorite={toggleFavorite}
+              />
+            )
           }
         />
         <Route path="*" element={<p>Page not found</p>} />
