@@ -35,11 +35,29 @@ describe("ArtPieceList", () => {
   it("displays all art pieces in a list", () => {
     render(
       <MemoryRouter>
-        <ArtPieceList artPieces={artPieces} />
+        <ArtPieceList
+          artPieces={artPieces}
+          isFavorite={() => false}
+          onToggleFavorite={() => {}}
+        />
       </MemoryRouter>
     );
 
     expect(screen.getByRole("list")).toBeInTheDocument();
     expect(screen.getAllByRole("listitem")).toHaveLength(3);
+  });
+
+  it("displays a favorite button on each entry", () => {
+    render(
+      <MemoryRouter>
+        <ArtPieceList
+          artPieces={artPieces}
+          isFavorite={() => false}
+          onToggleFavorite={() => {}}
+        />
+      </MemoryRouter>
+    );
+
+    expect(screen.getAllByRole("button")).toHaveLength(3);
   });
 });

@@ -16,7 +16,11 @@ const artPiece: ArtPiece = {
 function renderDetails() {
   return render(
     <MemoryRouter>
-      <ArtPieceDetails artPiece={artPiece} />
+      <ArtPieceDetails
+        artPiece={artPiece}
+        isFavorite={false}
+        onToggleFavorite={() => {}}
+      />
     </MemoryRouter>
   );
 }
@@ -45,6 +49,14 @@ describe("ArtPieceDetails", () => {
     renderDetails();
 
     expect(screen.getByText(text)).toBeInTheDocument();
+  });
+
+  it("displays the favorite button", () => {
+    renderDetails();
+
+    expect(
+      screen.getByRole("button", { name: "Favorite The Harvesters" })
+    ).toBeInTheDocument();
   });
 
   it("displays a back button that links to the list", () => {

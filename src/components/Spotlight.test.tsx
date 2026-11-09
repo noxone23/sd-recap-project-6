@@ -37,7 +37,13 @@ describe("Spotlight", () => {
   it("displays the image of the selected art piece", () => {
     mockRandom(0);
 
-    render(<Spotlight artPieces={artPieces} />);
+    render(
+      <Spotlight
+        artPieces={artPieces}
+        isFavorite={() => false}
+        onToggleFavorite={() => {}}
+      />
+    );
 
     const image = screen.getByRole("img", { name: "The Harvesters" });
     expect(image).toHaveAttribute("src", artPieces[0].imageSource);
@@ -46,24 +52,66 @@ describe("Spotlight", () => {
   it("displays the name of the artist of the selected art piece", () => {
     mockRandom(0.999);
 
-    render(<Spotlight artPieces={artPieces} />);
+    render(
+      <Spotlight
+        artPieces={artPieces}
+        isFavorite={() => false}
+        onToggleFavorite={() => {}}
+      />
+    );
 
     expect(screen.getByText("Vincent van Gogh")).toBeInTheDocument();
   });
 
+  it("displays the favorite button of the selected art piece", () => {
+    mockRandom(0.999);
+
+    render(
+      <Spotlight
+        artPieces={artPieces}
+        isFavorite={() => false}
+        onToggleFavorite={() => {}}
+      />
+    );
+
+    expect(
+      screen.getByRole("button", {
+        name: "Favorite Wheat Field with Cypresses",
+      })
+    ).toBeInTheDocument();
+  });
+
   it("keeps the same art piece when it renders again", () => {
     mockRandom(0);
-    const { rerender } = render(<Spotlight artPieces={artPieces} />);
+    const { rerender } = render(
+      <Spotlight
+        artPieces={artPieces}
+        isFavorite={() => false}
+        onToggleFavorite={() => {}}
+      />
+    );
 
     mockRandom(0.999);
-    rerender(<Spotlight artPieces={artPieces} />);
+    rerender(
+      <Spotlight
+        artPieces={artPieces}
+        isFavorite={() => false}
+        onToggleFavorite={() => {}}
+      />
+    );
 
     expect(screen.getByText("Pieter Bruegel the Elder")).toBeInTheDocument();
     expect(screen.queryByText("Vincent van Gogh")).not.toBeInTheDocument();
   });
 
   it("renders nothing when there are no art pieces", () => {
-    const { container } = render(<Spotlight artPieces={[]} />);
+    const { container } = render(
+      <Spotlight
+        artPieces={[]}
+        isFavorite={() => false}
+        onToggleFavorite={() => {}}
+      />
+    );
 
     expect(container).toBeEmptyDOMElement();
   });

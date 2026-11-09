@@ -6,3 +6,8 @@ export interface ArtPiece {
   year: string;
   genre: string;
 }
+
+export interface ArtPieceInfo {
+  slug: string;
+  isFavorite: boolean;
+}
