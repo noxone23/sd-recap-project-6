@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(.env)",
+      "Read(.env.*)",
+      "Read(secrets/**)",
+      "Bash(curl *)",
+      "Bash(wget *)"
+    ],
+    "defaultMode": "default"
+  },
+  "sandbox": {
+    "enabled": true
+  }
+}
