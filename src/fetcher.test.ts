@@ -7,6 +7,8 @@ const artPieces: ArtPiece[] = [
     name: "The Harvesters",
     artist: "Pieter Bruegel the Elder",
     imageSource: "https://example.com/the-harvesters.jpg",
+    year: "1565",
+    genre: "Renaissance",
   },
 ];
 
