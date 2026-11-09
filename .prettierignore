@@ -1,0 +1,9 @@
+dist
+coverage
+package-lock.json
+.github/templates
+.github/scripts
+.github/workflows/create-issues.yml
+docs
+README.md
+.claude
