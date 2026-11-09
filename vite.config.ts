@@ -18,7 +18,11 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "lcov"],
       include: ["src/**/*.{ts,tsx}"],
-      exclude: ["src/**/*.test.{ts,tsx}", "src/setupTests.ts", "src/vite-env.d.ts"],
+      exclude: [
+        "src/**/*.test.{ts,tsx}",
+        "src/setupTests.ts",
+        "src/vite-env.d.ts",
+      ],
     },
   },
 });
