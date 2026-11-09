@@ -27,7 +27,7 @@ Before a pull request, all of these must pass: `check`, `lint`, `format:check`, 
 - Test files are `*.test.ts` / `*.test.tsx` next to the source. Patterns must cover `.ts` and `.tsx`.
 - `vercel.json` rewrites all URLs to `index.html` so deep links like `/art-pieces/<slug>` work.
 - One feature branch and one pull request per issue. Skills in `.claude/skills/` (`plan-feature`, `tdd-feature`, `open-pr`, `create-issue`) guide the workflow; plans are saved in `docs/plans/<n>-<slug>.md`.
-- CI: `.github/workflows/build.yml` runs coverage and the SonarQube Cloud scan (secret `SONAR_TOKEN`, config in `sonar-project.properties`).
+- CI: `.github/workflows/sonar.yml` runs coverage and the SonarQube Cloud scan (secret `SONAR_TOKEN`, config in `sonar-project.properties`).
 - The `reviewer` agent in `.claude/agents/` reviews the branch with `git diff main...HEAD` and never edits files.
 
 ## Off limits
