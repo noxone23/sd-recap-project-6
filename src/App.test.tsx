@@ -231,6 +231,41 @@ describe("App", () => {
     ).toHaveAttribute("aria-pressed", "true");
   });
 
+  it("toggles the favorite on the spotlight", async () => {
+    mockRandom(0);
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/");
+
+    const button = await screen.findByRole("button", {
+      name: "Favorite The Harvesters",
+    });
+    expect(button).toHaveAttribute("aria-pressed", "false");
+
+    await user.click(button);
+    expect(button).toHaveAttribute("aria-pressed", "true");
+
+    await user.click(button);
+    expect(button).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("toggles the favorite on the details page", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces/the-harvesters");
+
+    const button = await screen.findByRole("button", {
+      name: "Favorite The Harvesters",
+    });
+    expect(button).toHaveAttribute("aria-pressed", "false");
+
+    await user.click(button);
+    expect(button).toHaveAttribute("aria-pressed", "true");
+
+    await user.click(button);
+    expect(button).toHaveAttribute("aria-pressed", "false");
+  });
+
   it("keeps the favorite status when navigating to the spotlight", async () => {
     mockRandom(0);
     mockArtPieces();

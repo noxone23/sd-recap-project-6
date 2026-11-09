@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 
 import type { ArtPiece } from "../types";
@@ -59,5 +60,47 @@ describe("ArtPieceList", () => {
     );
 
     expect(screen.getAllByRole("button")).toHaveLength(3);
+  });
+
+  it("marks only the favorite art pieces as pressed", () => {
+    render(
+      <MemoryRouter>
+        <ArtPieceList
+          artPieces={artPieces}
+          isFavorite={(slug) => slug === "the-night-watch"}
+          onToggleFavorite={() => {}}
+        />
+      </MemoryRouter>
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Favorite The Night Watch" })
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(
+      screen.getByRole("button", { name: "Favorite The Harvesters" })
+    ).toHaveAttribute("aria-pressed", "false");
+  });
+
+  it("toggles the favorite of the clicked art piece by its slug", async () => {
+    const onToggleFavorite = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <ArtPieceList
+          artPieces={artPieces}
+          isFavorite={() => false}
+          onToggleFavorite={onToggleFavorite}
+        />
+      </MemoryRouter>
+    );
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Favorite Wheat Field with Cypresses",
+      })
+    );
+
+    expect(onToggleFavorite).toHaveBeenCalledTimes(1);
+    expect(onToggleFavorite).toHaveBeenCalledWith("wheat-field-with-cypresses");
   });
 });
