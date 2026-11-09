@@ -12,12 +12,16 @@ const artPieces: ArtPiece[] = [
     name: "The Harvesters",
     artist: "Pieter Bruegel the Elder",
     imageSource: "https://example.com/the-harvesters.jpg",
+    year: "1565",
+    genre: "Renaissance",
   },
   {
     slug: "wheat-field-with-cypresses",
     name: "Wheat Field with Cypresses",
     artist: "Vincent van Gogh",
     imageSource: "https://example.com/wheat-field-with-cypresses.jpg",
+    year: "1889",
+    genre: "Post-Impressionism",
   },
 ];
 
@@ -130,6 +134,52 @@ describe("App", () => {
     renderApp("/does-not-exist");
 
     expect(await screen.findByText("Page not found")).toBeInTheDocument();
+  });
+
+  it("shows the details on the route /art-pieces/:slug", async () => {
+    mockArtPieces();
+
+    renderApp("/art-pieces/the-harvesters");
+
+    expect(
+      await screen.findByRole("heading", { name: "The Harvesters" })
+    ).toBeInTheDocument();
+    expect(screen.getByText("Pieter Bruegel the Elder")).toBeInTheDocument();
+    expect(screen.getByText("1565")).toBeInTheDocument();
+    expect(screen.getByText("Renaissance")).toBeInTheDocument();
+    expect(screen.getAllByRole("img")).toHaveLength(1);
+  });
+
+  it("shows the details after clicking an art piece in the list", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces");
+
+    await user.click(
+      await screen.findByRole("link", { name: /Wheat Field with Cypresses/ })
+    );
+
+    expect(screen.getByText("1889")).toBeInTheDocument();
+    expect(screen.getByText("Post-Impressionism")).toBeInTheDocument();
+    expect(screen.queryByRole("list")).not.toBeInTheDocument();
+  });
+
+  it("shows the list after clicking Back on the details page", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces/the-harvesters");
+
+    await user.click(await screen.findByRole("link", { name: "Back" }));
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+  });
+
+  it("shows Art piece not found for an unknown slug", async () => {
+    mockArtPieces();
+
+    renderApp("/art-pieces/unknown");
+
+    expect(await screen.findByText("Art piece not found")).toBeInTheDocument();
   });
 
   it.each(["/", "/art-pieces", "/does-not-exist"])(
