@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router";
 import useSWR from "swr";
 
 import ArtPieceList from "./components/ArtPieceList";
+import Spotlight from "./components/Spotlight";
 import { fetcher } from "./fetcher";
 import "./styles.css";
 import type { ArtPiece } from "./types";
@@ -27,6 +28,7 @@ export default function App() {
     <main>
       <h1>Art Gallery</h1>
       <Routes>
+        <Route path="/" element={<Spotlight artPieces={artPieces} />} />
         <Route
           path="/art-pieces"
           element={<ArtPieceList artPieces={artPieces} />}

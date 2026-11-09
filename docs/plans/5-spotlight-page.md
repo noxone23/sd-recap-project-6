@@ -14,18 +14,18 @@ Tests use Vitest and React Testing Library. The tests are written first.
 
 | Acceptance criterion                                    | Test                                                                                                                                              |
 | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| One art piece is randomly selected as spotlight feature | `getRandomArtPiece.test.ts`: `Math.random` at `0` returns the first, at `0.999` the last, at `0.5` the middle piece. A single piece is always returned. |
+| One art piece is randomly selected as spotlight feature | `getRandomArtPiece.test.ts`: the random value `0` returns the first, `0.999` the last, `0.5` the middle piece. A single piece is always returned. |
 | The image is displayed                                  | `Spotlight.test.tsx`: an `img` with `src` = `imageSource` and the name as `alt`.                                                                  |
 | The artist's name is displayed                          | `Spotlight.test.tsx`: the `artist` is visible.                                                                                                    |
 | The spotlight is available on the route `/`             | `App.test.tsx`: render at `/` with a mocked fetch shows the spotlight.                                                                            |
-| Hint: the piece is picked only once                     | `Spotlight.test.tsx`: after `rerender` with the same props the same piece stays, although `Math.random` now returns another value.                |
+| Hint: the piece is picked only once                     | `Spotlight.test.tsx`: after `rerender` with the same props the same piece stays, although the random value is now another one.                |
 | Empty list (decision 2)                                 | `Spotlight.test.tsx`: with `[]` nothing is rendered and nothing crashes.                                                                          |
 
 Existing tests stay unchanged. `/art-pieces` stays covered by the existing tests.
 
 ## Files
 
-- New: `src/getRandomArtPiece.ts` with `getRandomArtPiece(artPieces: ArtPiece[])` (`Math.floor(Math.random() * length)`, like the MDN example).
+- New: `src/getRandomArtPiece.ts` with `getRandomArtPiece(artPieces: ArtPiece[])`, based on `crypto.getRandomValues`.
 - New: `src/components/Spotlight.tsx`. It takes `artPieces` as a prop and picks once with `useState(() => getRandomArtPiece(artPieces))`. It shows the image (`alt` = `name`) and the artist, with the class `spotlight`.
 - Change: `src/App.tsx` gets `<Route path="/" element={<Spotlight artPieces={artPieces} />} />`.
 - New tests: `getRandomArtPiece.test.ts`, `Spotlight.test.tsx`. `App.test.tsx` gets one more test.
@@ -43,5 +43,5 @@ Existing tests stay unchanged. `/art-pieces` stays covered by the existing tests
 1. No title is shown, only the image and the artist (the name is the `alt` text).
 2. With an empty list the spotlight renders nothing.
 3. A new piece is picked on every visit of `/`, the pick stays the same within a visit. It is not cached in `App`.
-4. `Math.random` is mocked with `vi.spyOn`, the signature stays like the MDN example.
+4. The random value comes from `crypto.getRandomValues` (not `Math.random`: the lint rule `sonarjs/pseudo-random` flags it, and rules are not disabled). The tests mock `crypto.getRandomValues` with `vi.spyOn`.
 5. The `h1` "Art Gallery" stays in `App`.

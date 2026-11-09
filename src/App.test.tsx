@@ -30,8 +30,16 @@ function renderApp(path: string) {
   );
 }
 
+function mockRandom(fraction: number) {
+  return vi.spyOn(crypto, "getRandomValues").mockImplementation((array) => {
+    (array as Uint32Array)[0] = Math.floor(fraction * 2 ** 32);
+    return array;
+  });
+}
+
 afterEach(() => {
   vi.unstubAllGlobals();
+  vi.restoreAllMocks();
 });
 
 describe("App", () => {
@@ -46,6 +54,22 @@ describe("App", () => {
     expect(await screen.findByText("The Harvesters")).toBeInTheDocument();
     expect(screen.getByText("Vincent van Gogh")).toBeInTheDocument();
     expect(screen.getAllByRole("img")).toHaveLength(2);
+  });
+
+  it("shows the spotlight on the route /", async () => {
+    mockRandom(0.999);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, json: async () => artPieces })
+    );
+
+    renderApp("/");
+
+    expect(await screen.findByText("Vincent van Gogh")).toBeInTheDocument();
+    expect(screen.getAllByRole("img")).toHaveLength(1);
+    expect(
+      screen.getByRole("img", { name: "Wheat Field with Cypresses" })
+    ).toBeInTheDocument();
   });
 
   it("shows a loading message while the art pieces are loading", () => {
