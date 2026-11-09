@@ -27,6 +27,7 @@ The details page shows the color palette of the art piece: all colors of the art
 - `src/components/ArtPieceDetails.tsx`: render `<ColorPalette colors={artPiece.colors} />` below the genre, before the comments.
 - Tests: new `ColorPalette.test.tsx`; changed `ArtPieceDetails.test.tsx` and `App.test.tsx` (new tests).
 - Test fixtures: add a `colors` array to the 14 `ArtPiece` fixtures in the 7 test files above. Only test data changes, no assertion and no test is changed.
+- Two assertions in `App.test.tsx` are narrowed because the palette is a list (approved during implementation): "shows the details after clicking an art piece in the list" checks that "The Harvesters" is gone instead of "no list"; "does not add an empty comment" counts the list items only inside the Comments region.
 - `docs/plans/11-show-color-palette.md`: this plan, on branch `feature/11-show-color-palette`.
 
 ## Out of scope
