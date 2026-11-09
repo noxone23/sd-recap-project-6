@@ -269,6 +269,32 @@ describe("App", () => {
     expect(screen.getByText("Beautiful colors")).toBeInTheDocument();
   });
 
+  it("keeps the favorite status and the comments of an art piece together", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces/the-harvesters");
+
+    await user.click(
+      await screen.findByRole("button", { name: "Favorite The Harvesters" })
+    );
+    await user.type(
+      screen.getByRole("textbox", { name: "Comment" }),
+      "Beautiful colors"
+    );
+    await user.click(screen.getByRole("button", { name: "Add comment" }));
+
+    expect(screen.getByText("Beautiful colors")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Favorite The Harvesters" })
+    ).toHaveAttribute("aria-pressed", "true");
+
+    await user.click(
+      screen.getByRole("button", { name: "Favorite The Harvesters" })
+    );
+
+    expect(screen.getByText("Beautiful colors")).toBeInTheDocument();
+  });
+
   it("does not add an empty comment", async () => {
     mockArtPieces();
     const user = userEvent.setup();

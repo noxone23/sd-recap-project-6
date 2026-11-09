@@ -29,6 +29,20 @@ describe("CommentForm", () => {
     expect(field).toHaveValue("");
   });
 
+  it("trims the spaces around the text before calling onAddComment", async () => {
+    const onAddComment = vi.fn();
+    const user = userEvent.setup();
+    render(<CommentForm onAddComment={onAddComment} />);
+
+    await user.type(
+      screen.getByRole("textbox", { name: "Comment" }),
+      "  hello  "
+    );
+    await user.click(screen.getByRole("button", { name: "Add comment" }));
+
+    expect(onAddComment).toHaveBeenCalledWith("hello");
+  });
+
   it("does not call onAddComment for an empty comment", async () => {
     const onAddComment = vi.fn();
     const user = userEvent.setup();
