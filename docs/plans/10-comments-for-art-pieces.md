@@ -24,7 +24,7 @@ The details page gets a "Comments" section: a list of the comments of the shown 
 | Submit adds the comment, only to this art piece | `CommentForm.test.tsx`: submit calls `onAddComment` with the text and clears the field. `App.test.tsx`: add a comment on one details page, it is shown; open the other art piece, no comment there; come back, comment still there. |
 | Empty comments cannot be submitted | `CommentForm.test.tsx`: empty and whitespace-only submit does not call `onAddComment`. `App.test.tsx`: no list item is added. |
 
-Existing tests change only by passing the new props (`comments`, `onAddComment`) in the `renderDetails` helper of `ArtPieceDetails.test.tsx`; no assertion is changed. The favorite tests in `App.test.tsx` must keep passing unchanged.
+`Comments` renders the `ul` only when there are comments, so the existing test "shows the details after clicking an art piece in the list" (`queryByRole("list")` is absent on the details page) stays unchanged (decided during implementation). Existing tests change only by passing the new props (`comments`, `onAddComment`) in the `renderDetails` helper of `ArtPieceDetails.test.tsx`; no assertion is changed. The favorite tests in `App.test.tsx` must keep passing unchanged.
 
 ## Files
 
