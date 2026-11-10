@@ -53,11 +53,26 @@ function mockFrames() {
   };
 }
 
-function movePointer(x: number, y: number) {
+function movePointer(x: number, y: number, pointerType?: string) {
   fireEvent(
     window,
-    Object.assign(new Event("pointermove"), { clientX: x, clientY: y })
+    Object.assign(new Event("pointermove"), {
+      clientX: x,
+      clientY: y,
+      pointerType,
+    })
   );
+}
+
+function setPageSize(width: number, height: number) {
+  Object.defineProperty(document.documentElement, "clientWidth", {
+    configurable: true,
+    value: width,
+  });
+  Object.defineProperty(document.documentElement, "clientHeight", {
+    configurable: true,
+    value: height,
+  });
 }
 
 function setup() {
@@ -70,6 +85,8 @@ function setup() {
 }
 
 afterEach(() => {
+  Reflect.deleteProperty(document.documentElement, "clientWidth");
+  Reflect.deleteProperty(document.documentElement, "clientHeight");
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
@@ -111,21 +128,94 @@ describe("MouseTrail", () => {
     expect(canvas).not.toHaveAttribute("tabindex");
   });
 
-  it("sizes the canvas to the window and to the pixel ratio, also after a resize", () => {
+  it("sizes the canvas to the page without the scrollbar and to the pixel ratio, also after a resize", () => {
     vi.stubGlobal("innerWidth", 800);
     vi.stubGlobal("innerHeight", 600);
     vi.stubGlobal("devicePixelRatio", 2);
+    setPageSize(780, 590);
     const { container, context } = setup();
     const canvas = container.querySelector("canvas");
 
-    expect(canvas?.width).toBe(1600);
-    expect(canvas?.height).toBe(1200);
+    expect(canvas?.width).toBe(1560);
+    expect(canvas?.height).toBe(1180);
     expect(context.setTransform).toHaveBeenCalledWith(2, 0, 0, 2, 0, 0);
 
-    vi.stubGlobal("innerWidth", 1000);
+    setPageSize(1000, 590);
     fireEvent(window, new Event("resize"));
 
     expect(canvas?.width).toBe(2000);
+  });
+
+  it("rounds the canvas size to whole pixels", () => {
+    vi.stubGlobal("devicePixelRatio", 1.5);
+    setPageSize(801, 601);
+
+    const { container } = setup();
+    const canvas = container.querySelector("canvas");
+
+    expect(canvas?.width).toBe(1202);
+    expect(canvas?.height).toBe(902);
+  });
+
+  it("clears the whole page without the scrollbar", () => {
+    setPageSize(780, 590);
+    const { context, frames } = setup();
+
+    movePointer(100, 100);
+    frames.runFrame(0);
+
+    expect(context.clearRect).toHaveBeenCalledWith(0, 0, 780, 590);
+  });
+
+  it.each([["touch"], ["pen"]])("draws nothing for %s input", (pointerType) => {
+    const { context, frames } = setup();
+
+    movePointer(100, 100, pointerType);
+
+    expect(frames.requestFrame).not.toHaveBeenCalled();
+    frames.runFrame(0);
+    expect(context.arc).not.toHaveBeenCalled();
+  });
+
+  it("draws for mouse input", () => {
+    const { context, frames } = setup();
+
+    movePointer(100, 100, "mouse");
+    frames.runFrame(0);
+
+    expect(context.arc).toHaveBeenCalledTimes(1);
+  });
+
+  it("draws again when the tab is visible again", () => {
+    const { context, frames } = setup();
+    const hidden = vi.spyOn(document, "hidden", "get");
+    movePointer(100, 100);
+    hidden.mockReturnValue(true);
+    fireEvent(document, new Event("visibilitychange"));
+    hidden.mockReturnValue(false);
+    fireEvent(document, new Event("visibilitychange"));
+
+    movePointer(300, 300);
+    frames.runFrame(0);
+
+    expect(context.arc).toHaveBeenCalledWith(
+      300,
+      300,
+      expect.any(Number),
+      0,
+      Math.PI * 2
+    );
+  });
+
+  it("draws the first frame with the opacity of the particle", () => {
+    const { context, frames } = setup();
+    const alphas: number[] = [];
+    context.fill.mockImplementation(() => alphas.push(context.globalAlpha));
+
+    movePointer(100, 100);
+    frames.runFrame(0);
+
+    expect(alphas[0]).toBeCloseTo(0.7);
   });
 
   it("draws a circle at the pointer on the next frame", () => {

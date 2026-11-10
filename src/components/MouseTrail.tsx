@@ -32,8 +32,10 @@ function wantsTrail() {
 function resizeCanvas(trail: Trail) {
   const ratio = window.devicePixelRatio || 1;
 
-  trail.canvas.width = window.innerWidth * ratio;
-  trail.canvas.height = window.innerHeight * ratio;
+  const { clientWidth, clientHeight } = document.documentElement;
+
+  trail.canvas.width = Math.round(clientWidth * ratio);
+  trail.canvas.height = Math.round(clientHeight * ratio);
   trail.context?.setTransform(ratio, 0, 0, ratio, 0, 0);
 }
 
@@ -44,7 +46,9 @@ function drawParticles(trail: Trail) {
     return;
   }
 
-  context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+  const { clientWidth, clientHeight } = document.documentElement;
+
+  context.clearRect(0, 0, clientWidth, clientHeight);
 
   for (const particle of trail.particles) {
     context.globalAlpha = particleAlpha(particle);
@@ -90,11 +94,11 @@ function addPointer(trail: Trail, x: number, y: number) {
     return;
   }
 
+  const index = trail.count;
+
+  trail.count += 1;
   trail.last = { x, y };
-  trail.particles = addParticle(
-    trail.particles,
-    createParticle(x, y, trail.count++)
-  );
+  trail.particles = addParticle(trail.particles, createParticle(x, y, index));
 
   if (trail.frameId === null) {
     requestFrame(trail);
@@ -112,8 +116,11 @@ function startTrail(canvas: HTMLCanvasElement) {
     lastTime: null,
   };
 
-  const handlePointerMove = (event: PointerEvent) =>
-    addPointer(trail, event.clientX, event.clientY);
+  const handlePointerMove = (event: PointerEvent) => {
+    if (event.pointerType !== "touch" && event.pointerType !== "pen") {
+      addPointer(trail, event.clientX, event.clientY);
+    }
+  };
   const handleResize = () => resizeCanvas(trail);
   const handleVisibilityChange = () => {
     if (document.hidden) {
