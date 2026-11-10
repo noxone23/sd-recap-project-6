@@ -10,6 +10,7 @@ export default function SearchField({ value, onChange }: SearchFieldProps) {
       <input
         id="search"
         type="search"
+        placeholder="Search by title or artist"
         value={value}
         onChange={(event) => onChange(event.target.value)}
       />

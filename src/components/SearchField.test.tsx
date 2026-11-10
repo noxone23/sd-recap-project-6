@@ -12,6 +12,14 @@ describe("SearchField", () => {
     ).toBeInTheDocument();
   });
 
+  it("displays a placeholder that tells what can be searched", () => {
+    render(<SearchField value="" onChange={() => {}} />);
+
+    expect(
+      screen.getByPlaceholderText("Search by title or artist")
+    ).toBeInTheDocument();
+  });
+
   it("displays the given value", () => {
     render(<SearchField value="van gogh" onChange={() => {}} />);
 
