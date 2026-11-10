@@ -12,7 +12,26 @@
   --focus: #1a4fd6;
   --shadow: 0 8px 32px rgb(27 31 35 / 10%);
   --shadow-hover: 0 14px 40px rgb(27 31 35 / 18%);
+  --shadow-soft: 0 2px 8px rgb(27 31 35 / 10%);
+  --shadow-heart: 0 2px 8px rgb(27 31 35 / 15%);
+  --solid-hover: #fff;
+  --button-bg: #1b1f23;
+  --button-text: #fff;
+  --button-hover: #353b42;
+  --palette-edge: #0003;
+  --selection: rgb(179 35 79 / 25%);
+  --scroll-thumb: rgb(27 31 35 / 35%);
+  --scroll-track: rgb(255 255 255 / 50%);
+  --page-from: #eef2f7;
+  --page-to: #e9e6f3;
+  --page-blob-a: rgb(150 185 235 / 45%);
+  --page-blob-b: rgb(205 175 235 / 40%);
+  --header-blob-a1: rgb(110 165 245 / 48%);
+  --header-blob-a2: rgb(120 215 205 / 36%);
+  --header-blob-b1: rgb(215 150 240 / 46%);
+  --header-blob-b2: rgb(245 165 195 / 36%);
   --blur: blur(16px) saturate(150%);
+  color-scheme: light;
   --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
   --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
   --gutter: clamp(1rem, 4vw, 2rem);
@@ -27,6 +46,79 @@
   }
 }
 
+:root[data-theme="dark"] {
+  --wall: #0e1219;
+  --glass: rgb(28 34 48 / 58%);
+  --glass-strong: rgb(24 29 42 / 76%);
+  --glass-edge: rgb(255 255 255 / 14%);
+  --inset: rgb(255 255 255 / 7%);
+  --ink: #e9edf2;
+  --muted: #aeb6c2;
+  --line: rgb(255 255 255 / 14%);
+  --input-edge: rgb(255 255 255 / 55%);
+  --accent: #ff7a9c;
+  --focus: #7aa2ff;
+  --shadow: 0 8px 32px rgb(0 0 0 / 40%);
+  --shadow-hover: 0 14px 40px rgb(0 0 0 / 55%);
+  --shadow-soft: 0 2px 8px rgb(0 0 0 / 40%);
+  --shadow-heart: 0 2px 8px rgb(0 0 0 / 45%);
+  --solid-hover: #2b344a;
+  --button-bg: #e9edf2;
+  --button-text: #11151c;
+  --button-hover: #ffffff;
+  --palette-edge: rgb(255 255 255 / 30%);
+  --selection: rgb(255 122 156 / 30%);
+  --scroll-thumb: rgb(255 255 255 / 35%);
+  --scroll-track: rgb(255 255 255 / 8%);
+  --page-from: #0f1420;
+  --page-to: #1a1530;
+  --page-blob-a: rgb(60 90 170 / 40%);
+  --page-blob-b: rgb(110 70 170 / 35%);
+  --header-blob-a1: rgb(70 120 220 / 35%);
+  --header-blob-a2: rgb(50 160 160 / 28%);
+  --header-blob-b1: rgb(150 90 200 / 35%);
+  --header-blob-b2: rgb(200 90 130 / 28%);
+  color-scheme: dark;
+}
+
+/* Same values as above: the start value before the app sets data-theme. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --wall: #0e1219;
+    --glass: rgb(28 34 48 / 58%);
+    --glass-strong: rgb(24 29 42 / 76%);
+    --glass-edge: rgb(255 255 255 / 14%);
+    --inset: rgb(255 255 255 / 7%);
+    --ink: #e9edf2;
+    --muted: #aeb6c2;
+    --line: rgb(255 255 255 / 14%);
+    --input-edge: rgb(255 255 255 / 55%);
+    --accent: #ff7a9c;
+    --focus: #7aa2ff;
+    --shadow: 0 8px 32px rgb(0 0 0 / 40%);
+    --shadow-hover: 0 14px 40px rgb(0 0 0 / 55%);
+    --shadow-soft: 0 2px 8px rgb(0 0 0 / 40%);
+    --shadow-heart: 0 2px 8px rgb(0 0 0 / 45%);
+    --solid-hover: #2b344a;
+    --button-bg: #e9edf2;
+    --button-text: #11151c;
+    --button-hover: #ffffff;
+    --palette-edge: rgb(255 255 255 / 30%);
+    --selection: rgb(255 122 156 / 30%);
+    --scroll-thumb: rgb(255 255 255 / 35%);
+    --scroll-track: rgb(255 255 255 / 8%);
+    --page-from: #0f1420;
+    --page-to: #1a1530;
+    --page-blob-a: rgb(60 90 170 / 40%);
+    --page-blob-b: rgb(110 70 170 / 35%);
+    --header-blob-a1: rgb(70 120 220 / 35%);
+    --header-blob-a2: rgb(50 160 160 / 28%);
+    --header-blob-b1: rgb(150 90 200 / 35%);
+    --header-blob-b2: rgb(200 90 130 / 28%);
+    color-scheme: dark;
+  }
+}
+
 @supports not (
   (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
 ) {
@@ -34,6 +126,20 @@
     --glass: #ffffff;
     --glass-strong: #ffffff;
     --inset: #f1f2f4;
+  }
+
+  :root[data-theme="dark"] {
+    --glass: #1c2230;
+    --glass-strong: #181d2a;
+    --inset: #232a3a;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --glass: #1c2230;
+      --glass-strong: #181d2a;
+      --inset: #232a3a;
+    }
   }
 }
 
@@ -46,12 +152,12 @@
 html {
   scroll-padding-top: 5rem;
   overflow-y: scroll;
-  scrollbar-color: rgb(27 31 35 / 35%) rgb(255 255 255 / 50%);
+  scrollbar-color: var(--scroll-thumb) var(--scroll-track);
   scrollbar-width: thin;
 }
 
 ::selection {
-  background: rgb(179 35 79 / 25%);
+  background: var(--selection);
 }
 
 *,
@@ -68,17 +174,13 @@ body {
   color: var(--ink);
   background-color: var(--wall);
   background-image:
-    radial-gradient(
-      42rem 42rem at 8% 0%,
-      rgb(150 185 235 / 45%),
-      transparent 65%
-    ),
+    radial-gradient(42rem 42rem at 8% 0%, var(--page-blob-a), transparent 65%),
     radial-gradient(
       38rem 38rem at 95% 30%,
-      rgb(205 175 235 / 40%),
+      var(--page-blob-b),
       transparent 65%
     ),
-    linear-gradient(160deg, #eef2f7, #e9e6f3);
+    linear-gradient(160deg, var(--page-from), var(--page-to));
   background-attachment: fixed;
 }
 
@@ -104,6 +206,7 @@ header,
 .spotlight,
 .details,
 .favorite-button,
+.theme-toggle,
 input[type="search"],
 input[type="text"] {
   -webkit-backdrop-filter: var(--blur);
@@ -117,8 +220,7 @@ header {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.25rem 2rem;
+  gap: 0.25rem 0.75rem;
   padding: 0.75rem max(var(--gutter), calc((100% - 72rem) / 2 + var(--gutter)));
   background: var(--glass-strong);
   border-bottom: 1px solid var(--glass-edge);
@@ -143,8 +245,8 @@ header::before {
   left: 6%;
   background: radial-gradient(
     circle at 35% 45%,
-    rgb(110 165 245 / 48%),
-    rgb(120 215 205 / 36%) 60%,
+    var(--header-blob-a1),
+    var(--header-blob-a2) 60%,
     transparent 75%
   );
 }
@@ -154,8 +256,8 @@ header::after {
   right: 4%;
   background: radial-gradient(
     circle at 60% 45%,
-    rgb(215 150 240 / 46%),
-    rgb(245 165 195 / 36%) 60%,
+    var(--header-blob-b1),
+    var(--header-blob-b2) 60%,
     transparent 75%
   );
 }
@@ -207,8 +309,29 @@ header::after {
 }
 
 header h1 {
-  margin: 0;
+  margin: 0 auto 0 0;
   font-size: 1.6rem;
+}
+
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  color: var(--ink);
+  cursor: pointer;
+  background: var(--glass-strong);
+  border: 1px solid var(--glass-edge);
+  border-radius: 50%;
+  box-shadow: var(--shadow-heart);
+  transition:
+    background-color var(--transition),
+    color var(--transition);
+}
+
+.theme-toggle:hover {
+  background: var(--solid-hover);
 }
 
 nav {
@@ -237,7 +360,7 @@ nav a.active {
   color: var(--ink);
   background: var(--glass-strong);
   border-color: var(--glass-edge);
-  box-shadow: 0 2px 8px rgb(27 31 35 / 10%);
+  box-shadow: var(--shadow-soft);
 }
 
 main {
@@ -460,14 +583,14 @@ input::placeholder {
   background: var(--glass-strong);
   border: 1px solid var(--glass-edge);
   border-radius: 50%;
-  box-shadow: 0 2px 8px rgb(27 31 35 / 15%);
+  box-shadow: var(--shadow-heart);
   transition:
     background-color var(--transition),
     color var(--transition);
 }
 
 .favorite-button:hover {
-  background: #fff;
+  background: var(--solid-hover);
 }
 
 .favorite-button[aria-pressed="true"] {
@@ -498,7 +621,7 @@ input::placeholder {
   background: var(--glass-strong);
   border: 1px solid var(--glass-edge);
   border-radius: 999px;
-  box-shadow: 0 2px 8px rgb(27 31 35 / 10%);
+  box-shadow: var(--shadow-soft);
   transition: background-color var(--transition);
 }
 
@@ -507,7 +630,7 @@ input::placeholder {
 }
 
 .details > a:hover {
-  background: #fff;
+  background: var(--solid-hover);
 }
 
 .details h2 {
@@ -533,7 +656,7 @@ input::placeholder {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
-  border: 1px solid #0003;
+  border: 1px solid var(--palette-edge);
 }
 
 .details h3 {
@@ -579,16 +702,16 @@ input::placeholder {
   justify-self: start;
   padding: 0.6rem 1.25rem;
   font: inherit;
-  color: #fff;
+  color: var(--button-text);
   cursor: pointer;
-  background: var(--ink);
+  background: var(--button-bg);
   border: none;
   border-radius: var(--radius);
   transition: background-color var(--transition);
 }
 
 .comment-form button:hover {
-  background: #353b42;
+  background: var(--button-hover);
 }
 
 @media (max-width: 40rem) {
