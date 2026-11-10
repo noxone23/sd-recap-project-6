@@ -61,3 +61,14 @@ Decided: the toggle sits next to the title, one history entry when the search st
 
 ## Verification
 `npm run check`, `lint`, `format:check`, `test:run`, `build` green; `npm run coverage` covers the changed files; in Chrome at 390 and 1280 px: type on `/` and on the Gallery, Back, reload with `?q=`, the three-row phone header and its height, the tab order, light and dark screenshots, and no dropped characters while typing.
+
+## Changes after the approval (what was built)
+The plan above was approved first. While looking at the result in the browser, the layout was changed on request. These points replace the matching lines above:
+
+- **Header layout:** a grid over the full width. Row 1: the title on the left edge, the search field filling the space in between, the theme toggle on the right edge. Row 2: the navigation, centered over the whole width. On a phone: title and toggle, then the search, then the navigation (123 px high at 360 to 500 px).
+- **Search field:** no box any more, only a thin line below it (it gets darker and thicker on focus), with a magnifier icon in front. The icon is `Search` from `lucide-react` (already installed), hidden from screen readers. For the icon, `SearchField` got a `div` with the class `search-field` around the label, the icon and the input (the plan said `SearchField` stays unchanged); one new test checks the hidden icon.
+- **Order in the markup:** title, search field, theme toggle, navigation. The tab order is search, toggle, the three links. On a phone the toggle is shown in the first row, so there the visual order differs a little from the order in the markup.
+- **Color blobs:** larger (28 by 14 rem) and moved down, because the header is higher now. The pink blob is centered under the navigation and drifts to both sides.
+- **Search text on other pages:** `?q=` only counts on `/art-pieces`; the field is empty on all other pages and after a click on a navigation link.
+- **`scroll-padding-top`:** 7 rem on the desktop and 8.5 rem on a phone, so the sticky header does not cover a focused element.
+- **Tests:** `Gallery.test.tsx` was rewritten for the `query` prop, two tests in `App.test.tsx` ("no search field on `/` and `/favorites`") were replaced, and 17 new `App` tests were added. All other tests are unchanged.
