@@ -15,6 +15,7 @@ import ArtPieceDetails from "./components/ArtPieceDetails";
 import ArtPieceList from "./components/ArtPieceList";
 import BackToTop from "./components/BackToTop";
 import Gallery from "./components/Gallery";
+import MouseTrail from "./components/MouseTrail";
 import Navigation from "./components/Navigation";
 import SearchField from "./components/SearchField";
 import Spotlight from "./components/Spotlight";
@@ -221,6 +222,7 @@ export default function App() {
       </header>
       <main>{content}</main>
       <BackToTop onClick={handleBackToTop} />
+      <MouseTrail />
     </>
   );
 }

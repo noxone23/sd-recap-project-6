@@ -1047,3 +1047,59 @@ describe("App back to top", () => {
     ).toHaveAttribute("tabindex", "-1");
   });
 });
+
+describe("App mouse trail", () => {
+  function mockMedia({ reduce = false } = {}) {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn((query: string) => ({
+        matches: query.includes("prefers-reduced-motion") ? reduce : true,
+      }))
+    );
+  }
+
+  function renderLoadingApp(path: string) {
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(new Promise(() => {})));
+    return render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <MemoryRouter initialEntries={[path]}>
+          <App />
+        </MemoryRouter>
+      </SWRConfig>
+    );
+  }
+
+  beforeEach(() => {
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
+  });
+
+  it("shows no canvas when the browser has no matchMedia", () => {
+    const { container } = renderLoadingApp("/art-pieces");
+
+    expect(container.querySelector("canvas")).toBeNull();
+  });
+
+  it("shows no canvas when the user asks for reduced motion", () => {
+    mockMedia({ reduce: true });
+
+    const { container } = renderLoadingApp("/art-pieces");
+
+    expect(container.querySelector("canvas")).toBeNull();
+  });
+
+  it.each([
+    ["/"],
+    ["/art-pieces"],
+    ["/favorites"],
+    ["/art-pieces/the-harvesters"],
+    ["/does-not-exist"],
+  ])("shows exactly one hidden canvas on the route %s", (path) => {
+    mockMedia();
+
+    const { container } = renderLoadingApp(path);
+
+    const canvases = container.querySelectorAll("canvas");
+    expect(canvases).toHaveLength(1);
+    expect(canvases[0]).toHaveAttribute("aria-hidden", "true");
+  });
+});
