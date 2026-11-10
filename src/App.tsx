@@ -3,8 +3,8 @@ import type { ReactNode } from "react";
 import { Route, Routes, useParams } from "react-router";
 import useSWR from "swr";
 
-import ArtPieceDetails from "./components/ArtPieceDetails";
 import { loadArtPiecesInfo, saveArtPiecesInfo } from "./artPieceInfoStorage";
+import ArtPieceDetails from "./components/ArtPieceDetails";
 import ArtPieceList from "./components/ArtPieceList";
 import Navigation from "./components/Navigation";
 import Spotlight from "./components/Spotlight";
