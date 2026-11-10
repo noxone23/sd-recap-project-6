@@ -729,14 +729,23 @@ describe("App theme", () => {
   });
 
   it("does not change the saved favorites and comments", async () => {
+    const saved = JSON.stringify([
+      {
+        slug: "the-harvesters",
+        isFavorite: true,
+        comments: [
+          { text: "Beautiful colors", date: "2026-11-09T10:15:00.000Z" },
+        ],
+      },
+    ]);
+    localStorage.setItem("art-pieces-info", saved);
     const user = userEvent.setup();
     renderLoadingApp();
-    const before = localStorage.getItem("art-pieces-info");
 
     await user.click(
       screen.getByRole("button", { name: "Switch to dark mode" })
     );
 
-    expect(localStorage.getItem("art-pieces-info")).toBe(before);
+    expect(localStorage.getItem("art-pieces-info")).toBe(saved);
   });
 });

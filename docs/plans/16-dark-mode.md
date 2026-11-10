@@ -13,7 +13,7 @@ The app has a light glass design (issue 15). Issue 16 adds a button in the heade
   - `color-scheme: light` / `dark` per theme, so native controls and the scrollbar follow.
   - The `@supports not (backdrop-filter)` fallback also gets dark values (`--glass`, `--glass-strong`, `--inset`), otherwise it stays white in dark mode.
   - `.theme-toggle` is styled like the favorite button (round glass button, hover, focus ring). Header layout: title on the left, toggle and navigation on the right; on a phone the toggle stays in the first row next to the title and the navigation wraps to the second row.
-- **Dark palette (to be checked and adjusted by contrast):** dark blue-violet gradient background, dark translucent glass, light ink `#e9edf2`, muted `#aab2bd`, light edges, accent `#ff7a9c`, focus `#7aa2ff`, softer blobs. Every text, border, heart and focus pair is calculated like in issue 15 (text 4.5 or more, borders and focus 3 or more).
+- **Dark palette (to be checked and adjusted by contrast):** dark blue-violet gradient background, dark translucent glass, light ink `#e9edf2`, muted `#aeb6c2`, light edges, accent `#ff7a9c`, focus `#7aa2ff`, softer blobs. Every text, border, heart and focus pair is calculated like in issue 15 (text 4.5 or more, borders and focus 3 or more).
 
 ## Tests (per acceptance criterion)
 Written first, one at a time, each seen failing for the right reason.
