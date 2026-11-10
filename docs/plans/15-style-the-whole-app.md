@@ -1,7 +1,7 @@
-# Plan: Issue #27 – Style the Whole App with CSS
+# Plan: Issue 15 – Style the Whole App with CSS
 
 ## Context
-The app has only a basic style in `src/styles.css` (138 lines): a fixed bottom nav, a card grid, the favorite button, palette and comments. Many parts have no style at all: headings, the status messages, the Back link, the form controls, every hover and focus state, and any responsive rule. Issue 27 asks for one consistent, accessible, responsive design for all pages. Behavior and components stay as they are.
+The app has only a basic style in `src/styles.css` (138 lines): a fixed bottom nav, a card grid, the favorite button, palette and comments. Many parts have no style at all: headings, the status messages, the Back link, the form controls, every hover and focus state, and any responsive rule. Issue 15 asks for one consistent, accessible, responsive design for all pages. Behavior and components stay as they are.
 
 ## Approach
 CSS only, in `src/styles.css`. No component, test or `App.tsx` change. Design direction comes from the `frontend-design` plugin: a gallery feel (calm, lots of space, art in the center), not a generic template.
@@ -34,7 +34,7 @@ CSS cannot be checked by the jsdom unit tests, so I do not add tests (adding a t
 
 ## Files
 - Modify: `src/styles.css`
-- Create: `docs/plans/27-style-the-whole-app.md` (this plan)
+- Create: `docs/plans/15-style-the-whole-app.md` (this plan)
 
 ## Out of scope
 - Component, test, routing or markup changes (no new classes or wrappers; if one is needed I ask first).
