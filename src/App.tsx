@@ -80,7 +80,7 @@ export default function App() {
     if (isGallery) {
       setSearchParams(value ? { q: value } : {}, { replace: true });
     } else if (value) {
-      navigate({
+      void navigate({
         pathname: "/art-pieces",
         search: `?${new URLSearchParams({ q: value })}`,
       });
