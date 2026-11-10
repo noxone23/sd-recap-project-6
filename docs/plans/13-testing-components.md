@@ -8,12 +8,12 @@ Issue 13 asks for automated component tests for Spotlight, art piece preview and
 |---|---|---|
 | Spotlight | `Spotlight.test.tsx` (image, artist, favorite button, stable pick, empty list) | favorite button is pressed for a favorite; clicking it calls `onToggleFavorite` with the slug |
 | Preview and list | `ArtPiecePreview.test.tsx`, `ArtPieceList.test.tsx` (link href, list items, aria-pressed, toggle with slug) | preview: favorite button is pressed for a favorite; clicking it calls `onToggleFavorite` |
-| Navigation links | `Navigation.test.tsx` (3 links + hrefs, active on `/` and `/art-pieces`) | `active` class on `/favorites` |
-| Art piece details | `ArtPieceDetails.test.tsx` (image, title, artist/year/genre, palette, comments, form, back link) | clicking the favorite button calls `onToggleFavorite`; submitting the form calls `onAddComment` with the text |
+| Navigation links | `Navigation.test.tsx` (3 links + hrefs, active on `/` and `/art-pieces`) | `active` class on `/favorites` only |
+| Art piece details | `ArtPieceDetails.test.tsx` (image, title, artist/year/genre, palette, comments, form, back link) | favorite button is pressed for a favorite; clicking it calls `onToggleFavorite`; submitting the form calls `onAddComment` with the text |
 
 Steps:
 1. Run the existing tests and read each component against its task.
-2. Add the 7 missing tests. They test existing behavior, so they pass at once; each one was checked to fail when the behavior is broken.
+2. Add the 8 missing tests. They test existing behavior, so they pass at once; each one was checked to fail when the behavior is broken.
 3. Run `check`, `lint`, `format:check`, `test:run`, `build`.
 
 ## Files

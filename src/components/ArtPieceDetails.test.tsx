@@ -103,8 +103,27 @@ describe("ArtPieceDetails", () => {
     );
   });
 
+  it("marks the favorite button as pressed when the art piece is a favorite", () => {
+    render(
+      <MemoryRouter>
+        <ArtPieceDetails
+          artPiece={artPiece}
+          isFavorite={true}
+          onToggleFavorite={() => {}}
+          comments={[]}
+          onAddComment={() => {}}
+        />
+      </MemoryRouter>
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Favorite The Harvesters" })
+    ).toHaveAttribute("aria-pressed", "true");
+  });
+
   it("calls onToggleFavorite when the favorite button is clicked", async () => {
     const onToggleFavorite = vi.fn();
+    const user = userEvent.setup();
     render(
       <MemoryRouter>
         <ArtPieceDetails
@@ -117,7 +136,7 @@ describe("ArtPieceDetails", () => {
       </MemoryRouter>
     );
 
-    await userEvent.click(
+    await user.click(
       screen.getByRole("button", { name: "Favorite The Harvesters" })
     );
 
@@ -126,6 +145,7 @@ describe("ArtPieceDetails", () => {
 
   it("calls onAddComment with the text when the comment form is submitted", async () => {
     const onAddComment = vi.fn();
+    const user = userEvent.setup();
     render(
       <MemoryRouter>
         <ArtPieceDetails
@@ -138,11 +158,11 @@ describe("ArtPieceDetails", () => {
       </MemoryRouter>
     );
 
-    await userEvent.type(
+    await user.type(
       screen.getByRole("textbox", { name: "Comment" }),
       "Lovely light"
     );
-    await userEvent.click(screen.getByRole("button", { name: "Add comment" }));
+    await user.click(screen.getByRole("button", { name: "Add comment" }));
 
     expect(onAddComment).toHaveBeenCalledWith("Lovely light");
   });

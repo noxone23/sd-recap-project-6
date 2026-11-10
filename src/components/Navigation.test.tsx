@@ -68,5 +68,8 @@ describe("Navigation", () => {
     expect(screen.getByRole("link", { name: "Spotlight" })).not.toHaveClass(
       "active"
     );
+    expect(screen.getByRole("link", { name: "Gallery" })).not.toHaveClass(
+      "active"
+    );
   });
 });
