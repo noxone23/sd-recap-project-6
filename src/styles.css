@@ -358,13 +358,7 @@ header input[type="search"] {
 
 header input[type="search"]:focus-visible {
   border-bottom-color: var(--ink);
-  box-shadow:
-    0 2px 0 var(--ink),
-    0 8px 14px -8px color-mix(in srgb, var(--ink) 60%, transparent);
-}
-
-header .search-field:focus-within svg {
-  color: var(--ink);
+  box-shadow: 0 1px 0 var(--ink);
 }
 
 .theme-toggle {

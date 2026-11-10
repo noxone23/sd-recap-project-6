@@ -14,7 +14,7 @@ The search field was inside the Gallery page. Issue 17 moves it into the header,
 - **Header layout (`styles.css`)**:
   - Desktop: a grid over the full width. Row 1: the title on the left edge, the search field filling the space (no box, only a thin line below it), the theme toggle on the right edge. Row 2: the navigation, centered over the whole width. The header is about 105 px high.
   - Phone (max 40 rem): row 1 the title, row 2 the search field and the toggle next to it, row 3 the navigation, about 119 px high. The markup order equals the visual order.
-  - The label "Search" is hidden visually in the header (not removed). On focus the line gets thick (3 px) with a soft shadow, and the icon turns dark; there is no blue ring.
+  - The label "Search" is hidden visually in the header (not removed). On focus the line gets darker and 1 px thicker (2 px in total); there is no blue ring.
   - The color blobs in the header are larger (28 by 14 rem) and moved down for the higher header; the pink one is centered under the navigation and drifts to both sides.
   - `scroll-padding-top` is 7 rem on the desktop and 8.5 rem on a phone, so the sticky header does not cover a focused element.
 
