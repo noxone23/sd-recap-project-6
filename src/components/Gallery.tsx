@@ -23,7 +23,7 @@ export default function Gallery({
     <>
       <SearchField value={query} onChange={setQuery} />
       {filteredArtPieces.length === 0 ? (
-        <p>No art pieces found</p>
+        <p role="status">No art pieces found</p>
       ) : (
         <ArtPieceList
           artPieces={filteredArtPieces}

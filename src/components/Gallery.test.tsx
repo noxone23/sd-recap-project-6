@@ -96,6 +96,15 @@ describe("Gallery", () => {
     ).toBeInTheDocument();
   });
 
+  it("announces the message when nothing matches as a status", async () => {
+    const user = userEvent.setup();
+    renderGallery();
+
+    await user.type(screen.getByRole("searchbox", { name: "Search" }), "monet");
+
+    expect(screen.getByRole("status")).toHaveTextContent("No art pieces found");
+  });
+
   it("toggles the favorite of a found art piece by its slug", async () => {
     const onToggleFavorite = vi.fn();
     const user = userEvent.setup();

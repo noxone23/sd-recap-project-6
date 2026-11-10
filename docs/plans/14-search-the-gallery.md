@@ -6,7 +6,7 @@ The Gallery page (`/art-pieces`) shows all art pieces at once. Issue 14 adds a "
 ## Design
 - **`src/filterArtPieces.ts`** (new, pure function): `filterArtPieces(artPieces, query)`. It trims the query, compares lower case with lower case, and keeps a piece if the title or the artist includes the text. An empty (or only spaces) query returns all pieces. It follows the pattern of `getRandomArtPiece.ts` (logic in a plain module next to `App.tsx`, own `.test.ts`).
 - **`src/components/SearchField.tsx`** (new): props `value` and `onChange(value)`. A visible `<label htmlFor="search">Search</label>` and a controlled `<input id="search" type="search">`, in the style of `CommentForm`. The role is `searchbox`.
-- **`src/components/Gallery.tsx`** (new): props `artPieces`, `isFavorite`, `onToggleFavorite`. It holds `useState("")` for the text, computes the filtered list from the props and the text (not state), and renders `SearchField` and then `ArtPieceList`, or `<p>No art pieces found</p>` when the filtered list is empty.
+- **`src/components/Gallery.tsx`** (new): props `artPieces`, `isFavorite`, `onToggleFavorite`. It holds `useState("")` for the text, computes the filtered list from the props and the text (not state), and renders `SearchField` and then `ArtPieceList`, or `<p role="status">No art pieces found</p>` when the filtered list is empty (the `status` role was added after the review so screen readers announce it).
 - **`src/App.tsx`**: the `/art-pieces` route renders `<Gallery .../>` instead of `<ArtPieceList .../>`. Nothing else changes. `ArtPieceList` is not changed (it has no empty state; the caller handles it).
 
 ## Tests (per acceptance criterion)

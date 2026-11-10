@@ -601,20 +601,31 @@ describe("App", () => {
 
     expect(screen.getAllByRole("listitem")).toHaveLength(1);
     expect(screen.getByText("Wheat Field with Cypresses")).toBeInTheDocument();
+    expect(screen.queryByText("The Harvesters")).not.toBeInTheDocument();
   });
 
-  it.each([["/"], ["/favorites"]])(
-    "shows no search field on the route %s",
-    async (path) => {
-      mockRandom(0.999);
-      mockArtPieces();
+  it("shows no search field on the route /", async () => {
+    mockRandom(0.999);
+    mockArtPieces();
 
-      renderApp(path);
+    renderApp("/");
 
-      expect(await screen.findByRole("navigation")).toBeInTheDocument();
-      expect(
-        screen.queryByRole("searchbox", { name: "Search" })
-      ).not.toBeInTheDocument();
-    }
-  );
+    expect(
+      await screen.findByRole("img", { name: "Wheat Field with Cypresses" })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("searchbox", { name: "Search" })
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows no search field on the route /favorites", async () => {
+    mockArtPieces();
+
+    renderApp("/favorites");
+
+    expect(await screen.findByText("No favorites yet.")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("searchbox", { name: "Search" })
+    ).not.toBeInTheDocument();
+  });
 });
