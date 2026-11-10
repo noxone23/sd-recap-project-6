@@ -33,8 +33,13 @@ Favorites and comments live in `useState<ArtPieceInfo[]>([])` in `src/App.tsx:55
 ## Out of scope
 
 - Syncing between tabs (`storage` event), versioning or migration of the stored data.
-- Validating the shape of each stored entry beyond "is an array".
 - Storing the art pieces themselves, changing the UI, CI or config; issue 13.
+
+## Changes after the review (approved)
+
+- `loadArtPiecesInfo` and `saveArtPiecesInfo` catch errors of `localStorage` itself (blocked or full storage), so the app keeps working in memory. Tests stub `Storage.prototype.getItem` and `setItem` to throw.
+- `loadArtPiecesInfo` skips entries that are not valid (`slug` string, `isFavorite` boolean, `comments` array), so corrupt data cannot crash the app. Test with `null`, a number and entries with missing fields.
+- The "No favorites yet." test from the table above became a gallery test ("shows the gallery without any favorite when nothing is saved"), because the existing tests already cover `/favorites` and the new one would have been flagged by `sonarjs/parameterized-tests`.
 
 ## Open questions (proposals, change if you disagree)
 
