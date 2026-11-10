@@ -1,3 +1,5 @@
+import { Search } from "lucide-react";
+
 interface SearchFieldProps {
   value: string;
   onChange: (value: string) => void;
@@ -5,8 +7,9 @@ interface SearchFieldProps {
 
 export default function SearchField({ value, onChange }: SearchFieldProps) {
   return (
-    <>
+    <div className="search-field">
       <label htmlFor="search">Search</label>
+      <Search aria-hidden="true" />
       <input
         id="search"
         type="search"
@@ -14,6 +17,6 @@ export default function SearchField({ value, onChange }: SearchFieldProps) {
         value={value}
         onChange={(event) => onChange(event.target.value)}
       />
-    </>
+    </div>
   );
 }
