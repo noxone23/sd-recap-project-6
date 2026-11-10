@@ -207,6 +207,7 @@ header,
 .details,
 .favorite-button,
 .theme-toggle,
+.back-to-top,
 input[type="search"],
 input[type="text"] {
   -webkit-backdrop-filter: var(--blur);
@@ -380,6 +381,31 @@ header input[type="search"]:focus-visible {
 }
 
 .theme-toggle:hover {
+  background: var(--solid-hover);
+}
+
+.back-to-top {
+  position: fixed;
+  right: max(1.25rem, env(safe-area-inset-right));
+  bottom: max(1.25rem, env(safe-area-inset-bottom));
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  color: var(--ink);
+  cursor: pointer;
+  background: var(--glass-strong);
+  border: 1px solid var(--glass-edge);
+  border-radius: 50%;
+  box-shadow: var(--shadow-heart);
+  transition:
+    background-color var(--transition),
+    color var(--transition);
+}
+
+.back-to-top:hover {
   background: var(--solid-hover);
 }
 
@@ -774,7 +800,8 @@ input::placeholder {
     padding-block: 0.35rem;
   }
 
-  .theme-toggle {
+  .theme-toggle,
+  .back-to-top {
     width: 2.25rem;
     height: 2.25rem;
   }
