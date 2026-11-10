@@ -11,8 +11,14 @@ function scrollTo(position: number) {
   fireEvent.scroll(window);
 }
 
+const originalScrollY = Object.getOwnPropertyDescriptor(window, "scrollY");
+
 afterEach(() => {
-  Object.defineProperty(window, "scrollY", { configurable: true, value: 0 });
+  if (originalScrollY) {
+    Object.defineProperty(window, "scrollY", originalScrollY);
+  } else {
+    Reflect.deleteProperty(window, "scrollY");
+  }
   vi.restoreAllMocks();
 });
 
@@ -63,6 +69,18 @@ describe("BackToTop", () => {
     expect(screen.getByRole("button")).toBeInTheDocument();
   });
 
+  it("shows the button when the page was scrolled before the first scroll event", () => {
+    let reads = 0;
+    Object.defineProperty(window, "scrollY", {
+      configurable: true,
+      get: () => (reads++ === 0 ? 0 : 500),
+    });
+
+    render(<BackToTop onClick={() => {}} />);
+
+    expect(screen.getByRole("button")).toBeInTheDocument();
+  });
+
   it("calls onClick when the button is clicked", async () => {
     const onClick = vi.fn();
     const user = userEvent.setup();
@@ -100,15 +118,18 @@ describe("BackToTop", () => {
     );
   });
 
-  it("removes its scroll listener when it is removed from the page", () => {
+  it("removes the same passive scroll listener that it added", () => {
+    const addEventListener = vi.spyOn(window, "addEventListener");
     const removeEventListener = vi.spyOn(window, "removeEventListener");
     const { unmount } = render(<BackToTop onClick={() => {}} />);
+    const added = addEventListener.mock.calls.find(
+      ([type]) => type === "scroll"
+    );
 
     unmount();
 
-    expect(removeEventListener).toHaveBeenCalledWith(
-      "scroll",
-      expect.any(Function)
-    );
+    expect(added).toBeDefined();
+    expect(added?.[2]).toEqual({ passive: true });
+    expect(removeEventListener).toHaveBeenCalledWith("scroll", added?.[1]);
   });
 });

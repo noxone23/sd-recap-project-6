@@ -967,6 +967,7 @@ describe("App search in the header", () => {
 
 describe("App back to top", () => {
   const scrollToMock = vi.fn();
+  const originalScrollY = Object.getOwnPropertyDescriptor(window, "scrollY");
 
   function scrollTo(position: number) {
     Object.defineProperty(window, "scrollY", {
@@ -987,7 +988,11 @@ describe("App back to top", () => {
   });
 
   afterEach(() => {
-    Object.defineProperty(window, "scrollY", { configurable: true, value: 0 });
+    if (originalScrollY) {
+      Object.defineProperty(window, "scrollY", originalScrollY);
+    } else {
+      Reflect.deleteProperty(window, "scrollY");
+    }
   });
 
   it("shows no back to top button at the start", () => {

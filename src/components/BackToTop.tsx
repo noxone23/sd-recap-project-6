@@ -18,6 +18,7 @@ export default function BackToTop({ onClick }: BackToTopProps) {
     }
 
     window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
