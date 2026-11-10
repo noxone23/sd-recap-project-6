@@ -12,6 +12,7 @@ const artPiecesInfo: ArtPieceInfo[] = [
 
 afterEach(() => {
   localStorage.clear();
+  vi.restoreAllMocks();
 });
 
 describe("loadArtPiecesInfo", () => {
@@ -36,9 +37,40 @@ describe("loadArtPiecesInfo", () => {
 
     expect(loadArtPiecesInfo()).toEqual([]);
   });
+
+  it("returns an empty array when the local storage cannot be read", () => {
+    vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw new DOMException("Access denied", "SecurityError");
+    });
+
+    expect(loadArtPiecesInfo()).toEqual([]);
+  });
+
+  it("skips saved entries that are not valid art piece infos", () => {
+    localStorage.setItem(
+      "art-pieces-info",
+      JSON.stringify([
+        null,
+        1,
+        { slug: "no-flag", comments: [] },
+        { slug: "no-comments", isFavorite: true },
+        ...artPiecesInfo,
+      ])
+    );
+
+    expect(loadArtPiecesInfo()).toEqual(artPiecesInfo);
+  });
 });
 
 describe("saveArtPiecesInfo", () => {
+  it("does not throw when the local storage cannot be written", () => {
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new DOMException("Quota exceeded", "QuotaExceededError");
+    });
+
+    expect(() => saveArtPiecesInfo(artPiecesInfo)).not.toThrow();
+  });
+
   it("saves the art pieces info as JSON in the local storage", () => {
     saveArtPiecesInfo(artPiecesInfo);
 
