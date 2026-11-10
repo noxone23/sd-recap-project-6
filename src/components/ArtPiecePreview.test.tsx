@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 
 import type { ArtPiece } from "../types";
@@ -52,6 +53,42 @@ describe("ArtPiecePreview", () => {
     expect(
       screen.getByRole("button", { name: "Favorite The Harvesters" })
     ).toBeInTheDocument();
+  });
+
+  it("marks the favorite button as pressed when the art piece is a favorite", () => {
+    render(
+      <MemoryRouter>
+        <ArtPiecePreview
+          artPiece={artPiece}
+          isFavorite={true}
+          onToggleFavorite={() => {}}
+        />
+      </MemoryRouter>
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Favorite The Harvesters" })
+    ).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("calls onToggleFavorite when the favorite button is clicked", async () => {
+    const onToggleFavorite = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <ArtPiecePreview
+          artPiece={artPiece}
+          isFavorite={false}
+          onToggleFavorite={onToggleFavorite}
+        />
+      </MemoryRouter>
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "Favorite The Harvesters" })
+    );
+
+    expect(onToggleFavorite).toHaveBeenCalledTimes(1);
   });
 
   it("links to the details page of the art piece", () => {

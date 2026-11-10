@@ -1,4 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 
 import type { ArtPiece } from "../types";
@@ -100,5 +101,69 @@ describe("ArtPieceDetails", () => {
       "href",
       "/art-pieces"
     );
+  });
+
+  it("marks the favorite button as pressed when the art piece is a favorite", () => {
+    render(
+      <MemoryRouter>
+        <ArtPieceDetails
+          artPiece={artPiece}
+          isFavorite={true}
+          onToggleFavorite={() => {}}
+          comments={[]}
+          onAddComment={() => {}}
+        />
+      </MemoryRouter>
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Favorite The Harvesters" })
+    ).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("calls onToggleFavorite when the favorite button is clicked", async () => {
+    const onToggleFavorite = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <ArtPieceDetails
+          artPiece={artPiece}
+          isFavorite={false}
+          onToggleFavorite={onToggleFavorite}
+          comments={[]}
+          onAddComment={() => {}}
+        />
+      </MemoryRouter>
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "Favorite The Harvesters" })
+    );
+
+    expect(onToggleFavorite).toHaveBeenCalledTimes(1);
+  });
+
+  it("calls onAddComment with the text when the comment form is submitted", async () => {
+    const onAddComment = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <ArtPieceDetails
+          artPiece={artPiece}
+          isFavorite={false}
+          onToggleFavorite={() => {}}
+          comments={[]}
+          onAddComment={onAddComment}
+        />
+      </MemoryRouter>
+    );
+
+    await user.type(
+      screen.getByRole("textbox", { name: "Comment" }),
+      "Lovely light"
+    );
+    await user.click(screen.getByRole("button", { name: "Add comment" }));
+
+    expect(onAddComment).toHaveBeenCalledWith("Lovely light");
   });
 });
