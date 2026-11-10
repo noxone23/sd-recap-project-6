@@ -9,8 +9,11 @@ import ArtPieceList from "./components/ArtPieceList";
 import Gallery from "./components/Gallery";
 import Navigation from "./components/Navigation";
 import Spotlight from "./components/Spotlight";
+import ThemeToggle from "./components/ThemeToggle";
 import { fetcher } from "./fetcher";
 import "./styles.css";
+import { getInitialTheme, saveTheme } from "./theme";
+import type { Theme } from "./theme";
 import type { ArtPiece, ArtPieceComment, ArtPieceInfo } from "./types";
 
 const API_URL = "https://example-apis.vercel.app/api/art";
@@ -57,9 +60,22 @@ export default function App() {
   const [artPieceInfo, setArtPieceInfo] =
     useState<ArtPieceInfo[]>(loadArtPiecesInfo);
 
+  const [theme, setTheme] = useState<Theme>(getInitialTheme);
+
   useEffect(() => {
     saveArtPiecesInfo(artPieceInfo);
   }, [artPieceInfo]);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+  }, [theme]);
+
+  function toggleTheme() {
+    const next = theme === "dark" ? "light" : "dark";
+
+    setTheme(next);
+    saveTheme(next);
+  }
 
   function isFavorite(slug: string) {
     return artPieceInfo.some((info) => info.slug === slug && info.isFavorite);
@@ -163,6 +179,7 @@ export default function App() {
     <>
       <header>
         <h1>Art Gallery</h1>
+        <ThemeToggle theme={theme} onToggle={toggleTheme} />
         <Navigation />
       </header>
       <main>{content}</main>

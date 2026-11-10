@@ -629,3 +629,114 @@ describe("App", () => {
     ).not.toBeInTheDocument();
   });
 });
+
+describe("App theme", () => {
+  function mockSystemTheme(prefersDark: boolean) {
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn().mockReturnValue({ matches: prefersDark })
+    );
+  }
+
+  function renderLoadingApp() {
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(new Promise(() => {})));
+    return renderApp("/art-pieces");
+  }
+
+  afterEach(() => {
+    delete document.documentElement.dataset.theme;
+  });
+
+  it("shows the theme toggle in the header", () => {
+    renderLoadingApp();
+
+    expect(
+      within(screen.getByRole("banner")).getByRole("button", {
+        name: "Switch to dark mode",
+      })
+    ).toBeInTheDocument();
+  });
+
+  it("switches the theme and the label when the toggle is clicked", async () => {
+    const user = userEvent.setup();
+    renderLoadingApp();
+    expect(document.documentElement).toHaveAttribute("data-theme", "light");
+
+    await user.click(
+      screen.getByRole("button", { name: "Switch to dark mode" })
+    );
+
+    expect(document.documentElement).toHaveAttribute("data-theme", "dark");
+    expect(
+      screen.getByRole("button", { name: "Switch to light mode" })
+    ).toBeInTheDocument();
+  });
+
+  it("starts with the dark theme when the system setting is dark", () => {
+    mockSystemTheme(true);
+
+    renderLoadingApp();
+
+    expect(document.documentElement).toHaveAttribute("data-theme", "dark");
+    expect(
+      screen.getByRole("button", { name: "Switch to light mode" })
+    ).toBeInTheDocument();
+  });
+
+  it("prefers the saved choice to the system setting", () => {
+    mockSystemTheme(false);
+    localStorage.setItem("theme", "dark");
+
+    renderLoadingApp();
+
+    expect(document.documentElement).toHaveAttribute("data-theme", "dark");
+  });
+
+  it("saves the choice when the toggle is clicked", async () => {
+    const user = userEvent.setup();
+    renderLoadingApp();
+
+    await user.click(
+      screen.getByRole("button", { name: "Switch to dark mode" })
+    );
+
+    expect(localStorage.getItem("theme")).toBe("dark");
+  });
+
+  it("saves nothing as long as the toggle is not used", () => {
+    mockSystemTheme(true);
+
+    renderLoadingApp();
+
+    expect(localStorage.getItem("theme")).toBeNull();
+  });
+
+  it("keeps working when the local storage is blocked", async () => {
+    vi.spyOn(Storage.prototype, "getItem").mockImplementation(() => {
+      throw new DOMException("Access denied", "SecurityError");
+    });
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new DOMException("Quota exceeded", "QuotaExceededError");
+    });
+    const user = userEvent.setup();
+    renderLoadingApp();
+
+    await user.click(
+      screen.getByRole("button", { name: "Switch to dark mode" })
+    );
+
+    expect(document.documentElement).toHaveAttribute("data-theme", "dark");
+  });
+
+  it("does not change the saved favorites and comments", async () => {
+    const user = userEvent.setup();
+    renderLoadingApp();
+    const before = localStorage.getItem("art-pieces-info");
+
+    await user.click(
+      screen.getByRole("button", { name: "Switch to dark mode" })
+    );
+
+    expect(localStorage.getItem("art-pieces-info")).toBe(before);
+  });
+});
