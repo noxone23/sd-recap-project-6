@@ -6,6 +6,7 @@ import useSWR from "swr";
 import { loadArtPiecesInfo, saveArtPiecesInfo } from "./artPieceInfoStorage";
 import ArtPieceDetails from "./components/ArtPieceDetails";
 import ArtPieceList from "./components/ArtPieceList";
+import Gallery from "./components/Gallery";
 import Navigation from "./components/Navigation";
 import Spotlight from "./components/Spotlight";
 import { fetcher } from "./fetcher";
@@ -120,7 +121,7 @@ export default function App() {
         <Route
           path="/art-pieces"
           element={
-            <ArtPieceList
+            <Gallery
               artPieces={artPieces}
               isFavorite={isFavorite}
               onToggleFavorite={toggleFavorite}
