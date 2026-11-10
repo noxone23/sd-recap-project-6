@@ -52,6 +52,7 @@ function mockArtPieces() {
 }
 
 afterEach(() => {
+  localStorage.clear();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
@@ -447,6 +448,79 @@ describe("App", () => {
       expect(screen.getAllByRole("navigation")).toHaveLength(1);
     }
   );
+
+  it("keeps the favorites after the app is reloaded", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    const { unmount } = renderApp("/art-pieces");
+
+    await user.click(
+      await screen.findByRole("button", { name: "Favorite The Harvesters" })
+    );
+    unmount();
+    renderApp("/art-pieces");
+
+    expect(
+      await screen.findByRole("button", { name: "Favorite The Harvesters" })
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(
+      screen.getByRole("button", {
+        name: "Favorite Wheat Field with Cypresses",
+      })
+    ).toHaveAttribute("aria-pressed", "false");
+
+    await user.click(screen.getByRole("link", { name: "Favorites" }));
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+    expect(screen.getByText("The Harvesters")).toBeInTheDocument();
+  });
+
+  it("keeps the comments after the app is reloaded", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    const { unmount } = renderApp("/art-pieces/the-harvesters");
+
+    await user.type(
+      await screen.findByRole("textbox", { name: "Comment" }),
+      "Beautiful colors"
+    );
+    await user.click(screen.getByRole("button", { name: "Add comment" }));
+    unmount();
+    renderApp("/art-pieces/the-harvesters");
+
+    const comments = await screen.findByRole("region", { name: "Comments" });
+    expect(within(comments).getAllByRole("listitem")).toHaveLength(1);
+    expect(within(comments).getByText("Beautiful colors")).toBeInTheDocument();
+  });
+
+  it("keeps a removed favorite removed after the app is reloaded", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    const { unmount } = renderApp("/art-pieces");
+
+    const button = await screen.findByRole("button", {
+      name: "Favorite The Harvesters",
+    });
+    await user.click(button);
+    await user.click(button);
+    unmount();
+    renderApp("/favorites");
+
+    expect(await screen.findByText("No favorites yet.")).toBeInTheDocument();
+  });
+
+  it("shows the gallery without any favorite when nothing is saved", async () => {
+    mockArtPieces();
+    expect(localStorage.length).toBe(0);
+
+    renderApp("/art-pieces");
+
+    const buttons = await screen.findAllByRole("button", { name: /Favorite/ });
+    expect(buttons).toHaveLength(2);
+    buttons.forEach((button) =>
+      expect(button).toHaveAttribute("aria-pressed", "false")
+    );
+  });
 
   it("shows the navigation while the art pieces are loading", () => {
     vi.stubGlobal("fetch", vi.fn().mockReturnValue(new Promise(() => {})));
