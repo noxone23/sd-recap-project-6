@@ -544,4 +544,77 @@ describe("App", () => {
     ).toBeInTheDocument();
     expect(screen.getByRole("navigation")).toBeInTheDocument();
   });
+
+  it("shows a search field on the route /art-pieces", async () => {
+    mockArtPieces();
+
+    renderApp("/art-pieces");
+
+    expect(
+      await screen.findByRole("searchbox", { name: "Search" })
+    ).toBeInTheDocument();
+  });
+
+  it("shows only the art pieces that match the search on the route /art-pieces", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces");
+
+    await user.type(
+      await screen.findByRole("searchbox", { name: "Search" }),
+      "van gogh"
+    );
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+    expect(screen.getByText("Wheat Field with Cypresses")).toBeInTheDocument();
+    expect(screen.queryByText("The Harvesters")).not.toBeInTheDocument();
+  });
+
+  it("shows a message when no art piece matches the search", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces");
+
+    await user.type(
+      await screen.findByRole("searchbox", { name: "Search" }),
+      "monet"
+    );
+
+    expect(screen.getByText("No art pieces found")).toBeInTheDocument();
+  });
+
+  it("keeps the favorite button of a found art piece working", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces");
+
+    await user.type(
+      await screen.findByRole("searchbox", { name: "Search" }),
+      "wheat"
+    );
+    await user.click(
+      screen.getByRole("button", {
+        name: "Favorite Wheat Field with Cypresses",
+      })
+    );
+    await user.click(screen.getByRole("link", { name: "Favorites" }));
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+    expect(screen.getByText("Wheat Field with Cypresses")).toBeInTheDocument();
+  });
+
+  it.each([["/"], ["/favorites"]])(
+    "shows no search field on the route %s",
+    async (path) => {
+      mockRandom(0.999);
+      mockArtPieces();
+
+      renderApp(path);
+
+      expect(await screen.findByRole("navigation")).toBeInTheDocument();
+      expect(
+        screen.queryByRole("searchbox", { name: "Search" })
+      ).not.toBeInTheDocument();
+    }
+  );
 });
