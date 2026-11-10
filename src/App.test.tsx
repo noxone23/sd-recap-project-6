@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, useLocation, useNavigate } from "react-router";
 import { SWRConfig } from "swr";
@@ -962,5 +962,83 @@ describe("App search in the header", () => {
     expect(screen.getByRole("link", { name: "Gallery" })).toHaveFocus();
     await user.tab();
     expect(screen.getByRole("link", { name: "Favorites" })).toHaveFocus();
+  });
+});
+
+describe("App back to top", () => {
+  const scrollToMock = vi.fn();
+
+  function scrollTo(position: number) {
+    Object.defineProperty(window, "scrollY", {
+      configurable: true,
+      value: position,
+    });
+    fireEvent.scroll(window);
+  }
+
+  function renderLoadingApp(path: string) {
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(new Promise(() => {})));
+    return renderApp(path);
+  }
+
+  beforeEach(() => {
+    scrollToMock.mockClear();
+    vi.stubGlobal("scrollTo", scrollToMock);
+  });
+
+  afterEach(() => {
+    Object.defineProperty(window, "scrollY", { configurable: true, value: 0 });
+  });
+
+  it("shows no back to top button at the start", () => {
+    renderLoadingApp("/art-pieces");
+
+    expect(
+      screen.queryByRole("button", { name: "Back to top" })
+    ).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ["/"],
+    ["/art-pieces"],
+    ["/favorites"],
+    ["/art-pieces/the-harvesters"],
+    ["/does-not-exist"],
+  ])("shows the back to top button after scrolling on the route %s", (path) => {
+    renderLoadingApp(path);
+
+    scrollTo(500);
+
+    expect(
+      screen.getByRole("button", { name: "Back to top" })
+    ).toBeInTheDocument();
+  });
+
+  it("scrolls to the top when the button is clicked", async () => {
+    const user = userEvent.setup();
+    renderLoadingApp("/art-pieces");
+    scrollTo(500);
+
+    await user.click(screen.getByRole("button", { name: "Back to top" }));
+
+    expect(scrollToMock).toHaveBeenCalledWith({ top: 0 });
+  });
+
+  it("moves the focus to the page title when the button is clicked", async () => {
+    const user = userEvent.setup();
+    renderLoadingApp("/art-pieces");
+    scrollTo(500);
+
+    await user.click(screen.getByRole("button", { name: "Back to top" }));
+
+    expect(screen.getByRole("heading", { name: "Art Gallery" })).toHaveFocus();
+  });
+
+  it("keeps the page title out of the tab order", () => {
+    renderLoadingApp("/art-pieces");
+
+    expect(
+      screen.getByRole("heading", { name: "Art Gallery" })
+    ).toHaveAttribute("tabindex", "-1");
   });
 });
