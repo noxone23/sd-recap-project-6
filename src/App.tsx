@@ -1,6 +1,13 @@
 import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { Route, Routes, useParams } from "react-router";
+import {
+  Route,
+  Routes,
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router";
 import useSWR from "swr";
 
 import { loadArtPiecesInfo, saveArtPiecesInfo } from "./artPieceInfoStorage";
@@ -8,6 +15,7 @@ import ArtPieceDetails from "./components/ArtPieceDetails";
 import ArtPieceList from "./components/ArtPieceList";
 import Gallery from "./components/Gallery";
 import Navigation from "./components/Navigation";
+import SearchField from "./components/SearchField";
 import Spotlight from "./components/Spotlight";
 import ThemeToggle from "./components/ThemeToggle";
 import { fetcher } from "./fetcher";
@@ -61,6 +69,23 @@ export default function App() {
     useState<ArtPieceInfo[]>(loadArtPiecesInfo);
 
   const [theme, setTheme] = useState<Theme>(getInitialTheme);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const isGallery =
+    location.pathname === "/art-pieces" || location.pathname === "/art-pieces/";
+  const query = isGallery ? (searchParams.get("q") ?? "") : "";
+
+  function handleSearch(value: string) {
+    if (isGallery) {
+      setSearchParams(value ? { q: value } : {}, { replace: true });
+    } else if (value) {
+      void navigate({
+        pathname: "/art-pieces",
+        search: `?${new URLSearchParams({ q: value })}`,
+      });
+    }
+  }
 
   useEffect(() => {
     saveArtPiecesInfo(artPieceInfo);
@@ -139,6 +164,7 @@ export default function App() {
           element={
             <Gallery
               artPieces={artPieces}
+              query={query}
               isFavorite={isFavorite}
               onToggleFavorite={toggleFavorite}
             />
@@ -179,6 +205,7 @@ export default function App() {
     <>
       <header>
         <h1>Art Gallery</h1>
+        <SearchField value={query} onChange={handleSearch} />
         <ThemeToggle theme={theme} onToggle={toggleTheme} />
         <Navigation />
       </header>

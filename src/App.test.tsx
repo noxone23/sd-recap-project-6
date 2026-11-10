@@ -1,6 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter, useLocation, useNavigate } from "react-router";
 import { SWRConfig } from "swr";
 
 import App from "./App";
@@ -603,31 +603,6 @@ describe("App", () => {
     expect(screen.getByText("Wheat Field with Cypresses")).toBeInTheDocument();
     expect(screen.queryByText("The Harvesters")).not.toBeInTheDocument();
   });
-
-  it("shows no search field on the route /", async () => {
-    mockRandom(0.999);
-    mockArtPieces();
-
-    renderApp("/");
-
-    expect(
-      await screen.findByRole("img", { name: "Wheat Field with Cypresses" })
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole("searchbox", { name: "Search" })
-    ).not.toBeInTheDocument();
-  });
-
-  it("shows no search field on the route /favorites", async () => {
-    mockArtPieces();
-
-    renderApp("/favorites");
-
-    expect(await screen.findByText("No favorites yet.")).toBeInTheDocument();
-    expect(
-      screen.queryByRole("searchbox", { name: "Search" })
-    ).not.toBeInTheDocument();
-  });
 });
 
 describe("App theme", () => {
@@ -747,5 +722,245 @@ describe("App theme", () => {
     );
 
     expect(localStorage.getItem("art-pieces-info")).toBe(saved);
+  });
+});
+
+describe("App search in the header", () => {
+  function LocationDisplay() {
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    return (
+      <>
+        <span data-testid="path">{location.pathname}</span>
+        <span data-testid="query">
+          {new URLSearchParams(location.search).get("q") ?? ""}
+        </span>
+        <span data-testid="search">{location.search}</span>
+        <button type="button" onClick={() => navigate(-1)}>
+          Go back
+        </button>
+      </>
+    );
+  }
+
+  function renderAppWithLocation(path: string) {
+    return render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <MemoryRouter initialEntries={[path]}>
+          <App />
+          <LocationDisplay />
+        </MemoryRouter>
+      </SWRConfig>
+    );
+  }
+
+  function getSearchField() {
+    return screen.getByRole("searchbox", { name: "Search" });
+  }
+
+  it.each([
+    ["/"],
+    ["/art-pieces"],
+    ["/favorites"],
+    ["/art-pieces/the-harvesters"],
+    ["/does-not-exist"],
+  ])("shows the search field in the header on the route %s", (path) => {
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(new Promise(() => {})));
+
+    renderApp(path);
+
+    expect(
+      within(screen.getByRole("banner")).getByRole("searchbox", {
+        name: "Search",
+      })
+    ).toBeInTheDocument();
+  });
+
+  it("shows the search field in the header when loading fails", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: false, status: 500 })
+    );
+
+    renderApp("/art-pieces");
+
+    expect(
+      await screen.findByText("Failed to load art pieces.")
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByRole("banner")).getByRole("searchbox", {
+        name: "Search",
+      })
+    ).toBeInTheDocument();
+  });
+
+  it("has only one search field on the Gallery page", async () => {
+    mockArtPieces();
+
+    renderApp("/art-pieces");
+
+    expect(await screen.findAllByRole("listitem")).toHaveLength(2);
+    expect(screen.getAllByRole("searchbox")).toHaveLength(1);
+  });
+
+  it("opens the Gallery with the matching art pieces when typing on another page", async () => {
+    mockRandom(0.999);
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderAppWithLocation("/");
+    await screen.findByRole("img", { name: "Wheat Field with Cypresses" });
+
+    await user.type(getSearchField(), "van gogh");
+
+    expect(screen.getByTestId("path")).toHaveTextContent("/art-pieces");
+    expect(screen.getByTestId("query")).toHaveTextContent("van gogh");
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+    expect(getSearchField()).toHaveValue("van gogh");
+  });
+
+  it("keeps the Gallery page when typing in the Gallery", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderAppWithLocation("/art-pieces");
+    await screen.findAllByRole("listitem");
+
+    await user.type(getSearchField(), "gogh");
+
+    expect(screen.getByTestId("path")).toHaveTextContent("/art-pieces");
+    expect(screen.getByTestId("query")).toHaveTextContent("gogh");
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+  });
+
+  it("shows the field filled and the filtered list when the address has a search text", async () => {
+    mockArtPieces();
+
+    renderApp("/art-pieces?q=gogh");
+
+    expect(await screen.findAllByRole("listitem")).toHaveLength(1);
+    expect(getSearchField()).toHaveValue("gogh");
+  });
+
+  it("leads back to the page where the search started", async () => {
+    mockRandom(0.999);
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderAppWithLocation("/");
+    await screen.findByRole("img", { name: "Wheat Field with Cypresses" });
+    await user.type(getSearchField(), "wheat");
+
+    await user.click(screen.getByRole("button", { name: "Go back" }));
+
+    expect(screen.getByTestId("path")).toHaveTextContent("/");
+    expect(getSearchField()).toHaveValue("");
+  });
+
+  it("adds no history entry for each letter typed in the Gallery", async () => {
+    mockRandom(0.999);
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderAppWithLocation("/");
+    await screen.findByRole("img", { name: "Wheat Field with Cypresses" });
+    await user.click(screen.getByRole("link", { name: "Gallery" }));
+    await screen.findAllByRole("listitem");
+    await user.type(getSearchField(), "wheat");
+
+    await user.click(screen.getByRole("button", { name: "Go back" }));
+
+    expect(screen.getByTestId("path")).toHaveTextContent("/");
+  });
+
+  it("shows all art pieces and stays in the Gallery when the field is cleared", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderAppWithLocation("/art-pieces?q=gogh");
+    await screen.findAllByRole("listitem");
+
+    await user.clear(getSearchField());
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+    expect(screen.getByTestId("path")).toHaveTextContent("/art-pieces");
+    expect(screen.getByTestId("search")).toBeEmptyDOMElement();
+  });
+
+  it("empties the field when a navigation link is used", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces?q=gogh");
+    await screen.findAllByRole("listitem");
+
+    await user.click(screen.getByRole("link", { name: "Gallery" }));
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+    expect(getSearchField()).toHaveValue("");
+  });
+
+  it("does not filter the Favorites page by the search text of the address", async () => {
+    localStorage.setItem(
+      "art-pieces-info",
+      JSON.stringify([
+        { slug: "wheat-field-with-cypresses", isFavorite: true, comments: [] },
+      ])
+    );
+    mockArtPieces();
+
+    renderApp("/favorites?q=zzz");
+
+    expect(await screen.findAllByRole("listitem")).toHaveLength(1);
+    expect(getSearchField()).toHaveValue("");
+  });
+
+  it("filters by the search text when the Gallery address has a slash at the end", async () => {
+    mockArtPieces();
+
+    renderApp("/art-pieces/?q=gogh");
+
+    expect(await screen.findAllByRole("listitem")).toHaveLength(1);
+    expect(getSearchField()).toHaveValue("gogh");
+  });
+
+  it("keeps special characters of the search text in the address", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderAppWithLocation("/art-pieces");
+    await screen.findAllByRole("listitem");
+
+    await user.type(getSearchField(), "a&b+c%d#e");
+
+    expect(screen.getByTestId("search")).toHaveTextContent(
+      "?q=a%26b%2Bc%25d%23e"
+    );
+    expect(getSearchField()).toHaveValue("a&b+c%d#e");
+    expect(screen.getByRole("status")).toHaveTextContent("No art pieces found");
+  });
+
+  it("shows all art pieces when the search text is only spaces", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces");
+    await screen.findAllByRole("listitem");
+
+    await user.type(getSearchField(), "   ");
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+  });
+
+  it("puts the search field first, then the theme toggle, then the navigation links", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(new Promise(() => {})));
+    const user = userEvent.setup();
+    renderApp("/");
+
+    await user.tab();
+    expect(getSearchField()).toHaveFocus();
+    await user.tab();
+    expect(
+      screen.getByRole("button", { name: "Switch to dark mode" })
+    ).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("link", { name: "Spotlight" })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("link", { name: "Gallery" })).toHaveFocus();
+    await user.tab();
+    expect(screen.getByRole("link", { name: "Favorites" })).toHaveFocus();
   });
 });

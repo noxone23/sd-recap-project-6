@@ -20,6 +20,15 @@ describe("SearchField", () => {
     ).toBeInTheDocument();
   });
 
+  it("displays a search icon that is hidden from screen readers", () => {
+    const { container } = render(<SearchField value="" onChange={() => {}} />);
+
+    expect(container.querySelector("svg")).toHaveAttribute(
+      "aria-hidden",
+      "true"
+    );
+  });
+
   it("displays the given value", () => {
     render(<SearchField value="van gogh" onChange={() => {}} />);
 

@@ -26,11 +26,12 @@ const artPieces: ArtPiece[] = [
   },
 ];
 
-function renderGallery(onToggleFavorite = () => {}) {
+function renderGallery(query = "", onToggleFavorite = () => {}) {
   return render(
     <MemoryRouter>
       <Gallery
         artPieces={artPieces}
+        query={query}
         isFavorite={() => false}
         onToggleFavorite={onToggleFavorite}
       />
@@ -39,18 +40,20 @@ function renderGallery(onToggleFavorite = () => {}) {
 }
 
 describe("Gallery", () => {
-  it("displays the search field and all art pieces at first", () => {
+  it("has no search field of its own", () => {
     renderGallery();
 
-    expect(screen.getByRole("searchbox", { name: "Search" })).toHaveValue("");
+    expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
+  });
+
+  it("displays all art pieces when the query is empty", () => {
+    renderGallery("");
+
     expect(screen.getAllByRole("listitem")).toHaveLength(2);
   });
 
-  it("displays only the art pieces that match the typed text", async () => {
-    const user = userEvent.setup();
-    renderGallery();
-
-    await user.type(screen.getByRole("searchbox", { name: "Search" }), "wheat");
+  it("displays only the art pieces whose title matches the query", () => {
+    renderGallery("wheat");
 
     expect(screen.getAllByRole("listitem")).toHaveLength(1);
     expect(
@@ -59,58 +62,25 @@ describe("Gallery", () => {
     expect(screen.queryByText("The Harvesters")).not.toBeInTheDocument();
   });
 
-  it("finds art pieces by artist and ignores the case", async () => {
-    const user = userEvent.setup();
-    renderGallery();
-
-    await user.type(
-      screen.getByRole("searchbox", { name: "Search" }),
-      "BRUEGEL"
-    );
+  it("finds art pieces by artist and ignores the case and the outer spaces", () => {
+    renderGallery("  BRUEGEL ");
 
     expect(screen.getAllByRole("listitem")).toHaveLength(1);
     expect(screen.getByText("The Harvesters")).toBeInTheDocument();
   });
 
-  it("displays all art pieces again when the text is cleared", async () => {
-    const user = userEvent.setup();
-    renderGallery();
-    const searchField = screen.getByRole("searchbox", { name: "Search" });
-
-    await user.type(searchField, "wheat");
-    await user.clear(searchField);
-
-    expect(screen.getAllByRole("listitem")).toHaveLength(2);
-  });
-
-  it("displays a message and keeps the search field when nothing matches", async () => {
-    const user = userEvent.setup();
-    renderGallery();
-
-    await user.type(screen.getByRole("searchbox", { name: "Search" }), "monet");
-
-    expect(screen.getByText("No art pieces found")).toBeInTheDocument();
-    expect(screen.queryByRole("listitem")).not.toBeInTheDocument();
-    expect(
-      screen.getByRole("searchbox", { name: "Search" })
-    ).toBeInTheDocument();
-  });
-
-  it("announces the message when nothing matches as a status", async () => {
-    const user = userEvent.setup();
-    renderGallery();
-
-    await user.type(screen.getByRole("searchbox", { name: "Search" }), "monet");
+  it("displays a message as a status when nothing matches", () => {
+    renderGallery("monet");
 
     expect(screen.getByRole("status")).toHaveTextContent("No art pieces found");
+    expect(screen.queryByRole("listitem")).not.toBeInTheDocument();
   });
 
   it("toggles the favorite of a found art piece by its slug", async () => {
     const onToggleFavorite = vi.fn();
     const user = userEvent.setup();
-    renderGallery(onToggleFavorite);
+    renderGallery("wheat", onToggleFavorite);
 
-    await user.type(screen.getByRole("searchbox", { name: "Search" }), "wheat");
     await user.click(
       screen.getByRole("button", {
         name: "Favorite Wheat Field with Cypresses",

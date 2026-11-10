@@ -1,36 +1,31 @@
-import { useState } from "react";
-
 import { filterArtPieces } from "../filterArtPieces";
 import type { ArtPiece } from "../types";
 import ArtPieceList from "./ArtPieceList";
-import SearchField from "./SearchField";
 
 interface GalleryProps {
   artPieces: ArtPiece[];
+  query: string;
   isFavorite: (slug: string) => boolean;
   onToggleFavorite: (slug: string) => void;
 }
 
 export default function Gallery({
   artPieces,
+  query,
   isFavorite,
   onToggleFavorite,
 }: GalleryProps) {
-  const [query, setQuery] = useState("");
   const filteredArtPieces = filterArtPieces(artPieces, query);
 
+  if (filteredArtPieces.length === 0) {
+    return <p role="status">No art pieces found</p>;
+  }
+
   return (
-    <>
-      <SearchField value={query} onChange={setQuery} />
-      {filteredArtPieces.length === 0 ? (
-        <p role="status">No art pieces found</p>
-      ) : (
-        <ArtPieceList
-          artPieces={filteredArtPieces}
-          isFavorite={isFavorite}
-          onToggleFavorite={onToggleFavorite}
-        />
-      )}
-    </>
+    <ArtPieceList
+      artPieces={filteredArtPieces}
+      isFavorite={isFavorite}
+      onToggleFavorite={onToggleFavorite}
+    />
   );
 }
