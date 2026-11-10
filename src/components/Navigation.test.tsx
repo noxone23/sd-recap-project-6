@@ -58,4 +58,15 @@ describe("Navigation", () => {
       "active"
     );
   });
+
+  it("highlights only the Favorites link on the route /favorites", () => {
+    renderNavigation("/favorites");
+
+    expect(screen.getByRole("link", { name: "Favorites" })).toHaveClass(
+      "active"
+    );
+    expect(screen.getByRole("link", { name: "Spotlight" })).not.toHaveClass(
+      "active"
+    );
+  });
 });

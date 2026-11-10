@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
 import type { ArtPiece } from "../types";
 import Spotlight from "./Spotlight";
@@ -81,6 +82,46 @@ describe("Spotlight", () => {
         name: "Favorite Wheat Field with Cypresses",
       })
     ).toBeInTheDocument();
+  });
+
+  it("marks the favorite button as pressed when the art piece is a favorite", () => {
+    mockRandom(0.999);
+
+    render(
+      <Spotlight
+        artPieces={artPieces}
+        isFavorite={(slug) => slug === "wheat-field-with-cypresses"}
+        onToggleFavorite={() => {}}
+      />
+    );
+
+    expect(
+      screen.getByRole("button", {
+        name: "Favorite Wheat Field with Cypresses",
+      })
+    ).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("toggles the favorite of the selected art piece by its slug", async () => {
+    mockRandom(0.999);
+    const onToggleFavorite = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <Spotlight
+        artPieces={artPieces}
+        isFavorite={() => false}
+        onToggleFavorite={onToggleFavorite}
+      />
+    );
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Favorite Wheat Field with Cypresses",
+      })
+    );
+
+    expect(onToggleFavorite).toHaveBeenCalledTimes(1);
+    expect(onToggleFavorite).toHaveBeenCalledWith("wheat-field-with-cypresses");
   });
 
   it("keeps the same art piece when it renders again", () => {
