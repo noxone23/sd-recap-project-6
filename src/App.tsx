@@ -72,7 +72,8 @@ export default function App() {
   const location = useLocation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const isGallery = location.pathname === "/art-pieces";
+  const isGallery =
+    location.pathname === "/art-pieces" || location.pathname === "/art-pieces/";
   const query = isGallery ? (searchParams.get("q") ?? "") : "";
 
   function handleSearch(value: string) {

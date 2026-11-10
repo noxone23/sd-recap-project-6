@@ -910,6 +910,41 @@ describe("App search in the header", () => {
     expect(getSearchField()).toHaveValue("");
   });
 
+  it("filters by the search text when the Gallery address has a slash at the end", async () => {
+    mockArtPieces();
+
+    renderApp("/art-pieces/?q=gogh");
+
+    expect(await screen.findAllByRole("listitem")).toHaveLength(1);
+    expect(getSearchField()).toHaveValue("gogh");
+  });
+
+  it("keeps special characters of the search text in the address", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderAppWithLocation("/art-pieces");
+    await screen.findAllByRole("listitem");
+
+    await user.type(getSearchField(), "a&b+c%d#e");
+
+    expect(screen.getByTestId("search")).toHaveTextContent(
+      "?q=a%26b%2Bc%25d%23e"
+    );
+    expect(getSearchField()).toHaveValue("a&b+c%d#e");
+    expect(screen.getByRole("status")).toHaveTextContent("No art pieces found");
+  });
+
+  it("shows all art pieces when the search text is only spaces", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces");
+    await screen.findAllByRole("listitem");
+
+    await user.type(getSearchField(), "   ");
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+  });
+
   it("puts the search field first, then the theme toggle, then the navigation links", async () => {
     vi.stubGlobal("fetch", vi.fn().mockReturnValue(new Promise(() => {})));
     const user = userEvent.setup();
