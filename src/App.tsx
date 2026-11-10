@@ -161,11 +161,11 @@ export default function App() {
 
   return (
     <>
-      <main>
+      <header>
         <h1>Art Gallery</h1>
-        {content}
-      </main>
-      <Navigation />
+        <Navigation />
+      </header>
+      <main>{content}</main>
     </>
   );
 }
