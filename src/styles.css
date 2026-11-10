@@ -44,6 +44,7 @@
 }
 
 html {
+  scroll-padding-top: 5rem;
   overflow-y: scroll;
   scrollbar-color: rgb(27 31 35 / 35%) rgb(255 255 255 / 50%);
   scrollbar-width: thin;
@@ -331,7 +332,6 @@ input::placeholder {
 
 .art-piece:hover {
   box-shadow: var(--shadow-hover);
-  transform: translateY(-2px);
 }
 
 @keyframes rise {
@@ -382,6 +382,10 @@ input::placeholder {
     transition:
       transform 0.4s ease,
       clip-path 0.4s ease;
+  }
+
+  .art-piece:hover {
+    transform: translateY(-2px);
   }
 
   .art-piece:hover img,
@@ -588,6 +592,10 @@ input::placeholder {
 }
 
 @media (max-width: 40rem) {
+  html {
+    scroll-padding-top: 7.5rem;
+  }
+
   nav {
     justify-content: space-between;
     width: 100%;

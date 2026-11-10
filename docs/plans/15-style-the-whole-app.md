@@ -30,7 +30,9 @@ CSS in `src/styles.css`, one small structure change in `App.tsx` and a placehold
 6. **Details:** the Back link is a glass pill with an arrow (`::before`, empty alt text), the image, title and info, the color palette, comments as small glass bubbles, the comment form.
 7. **Messages:** Loading, error, "No favorites yet.", "No art pieces found", "Page not found" and "Art piece not found" are bare `<p>` in `main`. They are centered, large and have an empty picture frame above them (`main > p::before`).
 8. **Motion:** the cards, the spotlight and the details card rise in on every page (0.6 s, the gallery cards a little staggered). Smooth scrolling. All motion is off with `prefers-reduced-motion`.
-9. **Base:** `:focus-visible` ring, text selection color, thin scrollbar that is always shown (no layout jump between short and long pages), responsive from phone to wide screen.
+9. **Base:** `:focus-visible` ring, text selection color, thin scrollbar that is always shown (no layout jump between short and long pages), scroll padding so the sticky header does not cover a focused element, responsive from phone to wide screen.
+
+Known limitation: on the Details page the favorite button sits at a fixed offset (`top: 4.4rem`) below the Back button. With a much larger font size or strong browser zoom it can move. A clean fix needs a wrapper around the image, which this issue does not allow.
 
 ## Constraints that were kept
 - The class names stayed (`art-list`, `art-piece`, `spotlight`, `details`, `palette`, `comments`, `comment-form`, `favorite-button`).
