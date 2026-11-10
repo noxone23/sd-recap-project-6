@@ -358,7 +358,13 @@ header input[type="search"] {
 
 header input[type="search"]:focus-visible {
   border-bottom-color: var(--ink);
-  box-shadow: 0 1px 0 var(--ink);
+  box-shadow:
+    0 2px 0 var(--ink),
+    0 8px 14px -8px color-mix(in srgb, var(--ink) 60%, transparent);
+}
+
+header .search-field:focus-within svg {
+  color: var(--ink);
 }
 
 .theme-toggle {
@@ -767,8 +773,8 @@ input::placeholder {
 
   header {
     grid-template-areas:
-      "title toggle"
-      "search search"
+      "title title"
+      "search toggle"
       "nav nav";
     grid-template-columns: minmax(0, 1fr) auto;
     padding-block: 0.35rem;
