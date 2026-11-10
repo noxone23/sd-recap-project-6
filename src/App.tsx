@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import {
   Route,
@@ -13,6 +13,7 @@ import useSWR from "swr";
 import { loadArtPiecesInfo, saveArtPiecesInfo } from "./artPieceInfoStorage";
 import ArtPieceDetails from "./components/ArtPieceDetails";
 import ArtPieceList from "./components/ArtPieceList";
+import BackToTop from "./components/BackToTop";
 import Gallery from "./components/Gallery";
 import Navigation from "./components/Navigation";
 import SearchField from "./components/SearchField";
@@ -94,6 +95,13 @@ export default function App() {
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
+
+  const titleRef = useRef<HTMLHeadingElement>(null);
+
+  function handleBackToTop() {
+    window.scrollTo({ top: 0 });
+    titleRef.current?.focus({ preventScroll: true });
+  }
 
   function toggleTheme() {
     const next = theme === "dark" ? "light" : "dark";
@@ -204,12 +212,15 @@ export default function App() {
   return (
     <>
       <header>
-        <h1>Art Gallery</h1>
+        <h1 ref={titleRef} tabIndex={-1}>
+          Art Gallery
+        </h1>
         <SearchField value={query} onChange={handleSearch} />
         <ThemeToggle theme={theme} onToggle={toggleTheme} />
         <Navigation />
       </header>
       <main>{content}</main>
+      <BackToTop onClick={handleBackToTop} />
     </>
   );
 }
