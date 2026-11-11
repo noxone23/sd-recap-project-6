@@ -262,7 +262,13 @@ export default function App() {
       <header>
         <h1 ref={titleRef} tabIndex={-1}>
           <Link to="/" tabIndex={-1}>
-            Art Gallery
+            <img
+              className="logo"
+              src="/logo.png"
+              alt="Art Gallery"
+              width="2048"
+              height="768"
+            />
           </Link>
         </h1>
         <SearchField value={query} onChange={handleSearch} />

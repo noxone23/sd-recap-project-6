@@ -227,6 +227,39 @@ describe("App", () => {
     );
   });
 
+  it("shows the logo in the header", () => {
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(new Promise(() => {})));
+
+    renderApp("/art-pieces");
+
+    const logo = within(screen.getByRole("banner")).getByRole("img", {
+      name: "Art Gallery",
+    });
+    expect(logo).toHaveAttribute("src", "/logo.png");
+  });
+
+  it("keeps the logo inside the main heading and the link to the start page", () => {
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(new Promise(() => {})));
+
+    renderApp("/art-pieces");
+
+    const heading = screen.getByRole("heading", { level: 1 });
+    const link = within(heading).getByRole("link", { name: "Art Gallery" });
+    expect(within(link).getByRole("img", { name: "Art Gallery" })).toBe(
+      screen.getByRole("img", { name: "Art Gallery" })
+    );
+  });
+
+  it("gives the logo a width and a height so the page does not jump", () => {
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(new Promise(() => {})));
+
+    renderApp("/art-pieces");
+
+    const logo = screen.getByRole("img", { name: "Art Gallery" });
+    expect(logo).toHaveAttribute("width", "2048");
+    expect(logo).toHaveAttribute("height", "768");
+  });
+
   it("shows the favorites page after clicking Favorites", async () => {
     mockArtPieces();
     const user = userEvent.setup();
