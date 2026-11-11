@@ -216,6 +216,7 @@ describe("what stays without gold", () => {
     ["the buttons of the comment form", ".comment-form button"],
     ["the comment boxes", ".comments li"],
   ])("does not use gold for %s", (_description, selector) => {
+    expect(declarationsOf(selector)).not.toBe("");
     expect(declarationsOf(selector)).not.toContain("var(--gold)");
   });
 
