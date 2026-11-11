@@ -131,6 +131,7 @@ describe("ArtPieceDetails", () => {
   it.each([
     ["is missing", null],
     ["is not a path", { from: "https://example.com" }],
+    ["has a backslash after the slash", { from: "/\\evil.com" }],
     ["is not a text", { from: 42 }],
   ])("links the back button to the list when the state %s", (_case, state) => {
     renderDetailsWithState(state);
