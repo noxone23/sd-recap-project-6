@@ -62,3 +62,7 @@ Changed:
 ## After approval
 
 Save the experiment (see question 1), create branch `feature/47-show-the-logo-in-the-header` from `main`, save this plan as `docs/plans/47-show-the-logo-in-the-header.md`, commit it. No implementation, no push, no PR.
+
+## Added after approval (found at the start of the implementation)
+
+The plan said that no existing test changes. That was wrong: six tests in `App.test.tsx` (lines 110, 123, 172, 184, 201, 294) count all images with `getAllByRole("img")`, and the logo in the header is one more image. Decided with the user: these six counts are limited to the main area, `within(screen.getByRole("main")).getAllByRole("img")`. The expected numbers stay the same. This is the only change to existing tests, done first while they are green, before the logo is added.
