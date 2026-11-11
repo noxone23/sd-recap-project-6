@@ -152,7 +152,7 @@ function TrailCanvas() {
     return canvas ? startTrail(canvas) : undefined;
   }, []);
 
-  return <canvas ref={canvasRef} className="mouse-trail" aria-hidden="true" />;
+  return <canvas ref={canvasRef} className="mouse-trail" inert />;
 }
 
 export default function MouseTrail() {

@@ -124,7 +124,8 @@ describe("MouseTrail", () => {
 
     const canvas = container.querySelector("canvas");
 
-    expect(canvas).toHaveAttribute("aria-hidden", "true");
+    expect(canvas).toHaveAttribute("inert");
+    expect(canvas).not.toHaveAttribute("aria-hidden");
     expect(canvas).not.toHaveAttribute("tabindex");
   });
 
