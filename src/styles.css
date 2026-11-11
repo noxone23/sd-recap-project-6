@@ -150,7 +150,7 @@
 }
 
 html {
-  scroll-padding-top: 7rem;
+  scroll-padding-top: 10.5rem;
   overflow-y: scroll;
   scrollbar-color: var(--scroll-thumb) var(--scroll-track);
   scrollbar-width: thin;
@@ -320,6 +320,13 @@ header h1 {
 
 header h1 a {
   text-decoration: none;
+}
+
+.logo {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: 6rem;
 }
 
 header label {
@@ -847,7 +854,11 @@ main > a:hover {
 
 @media (max-width: 40rem) {
   html {
-    scroll-padding-top: 8.5rem;
+    scroll-padding-top: 10.75rem;
+  }
+
+  .logo {
+    height: 4rem;
   }
 
   header {
