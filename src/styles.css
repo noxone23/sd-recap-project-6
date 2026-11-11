@@ -10,6 +10,7 @@
   --input-edge: rgb(27 31 35 / 60%);
   --accent: #b3234f;
   --focus: #1a4fd6;
+  --gold: #a37d28;
   --shadow: 0 8px 32px rgb(27 31 35 / 10%);
   --shadow-hover: 0 14px 40px rgb(27 31 35 / 18%);
   --shadow-soft: 0 2px 8px rgb(27 31 35 / 10%);
@@ -58,6 +59,7 @@
   --input-edge: rgb(255 255 255 / 55%);
   --accent: #ff7a9c;
   --focus: #7aa2ff;
+  --gold: #e0b95a;
   --shadow: 0 8px 32px rgb(0 0 0 / 40%);
   --shadow-hover: 0 14px 40px rgb(0 0 0 / 55%);
   --shadow-soft: 0 2px 8px rgb(0 0 0 / 40%);
@@ -95,6 +97,7 @@
     --input-edge: rgb(255 255 255 / 55%);
     --accent: #ff7a9c;
     --focus: #7aa2ff;
+    --gold: #e0b95a;
     --shadow: 0 8px 32px rgb(0 0 0 / 40%);
     --shadow-hover: 0 14px 40px rgb(0 0 0 / 55%);
     --shadow-soft: 0 2px 8px rgb(0 0 0 / 40%);
@@ -362,15 +365,15 @@ header input[type="search"] {
   padding: 0.35rem 0.25rem 0.35rem 2rem;
   background: transparent;
   border: none;
-  border-bottom: 1px solid var(--input-edge);
+  border-bottom: 1px solid var(--gold);
   border-radius: 0;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
 
 header input[type="search"]:focus-visible {
-  border-bottom-color: var(--ink);
-  box-shadow: 0 1px 0 var(--ink);
+  border-bottom-color: var(--gold);
+  box-shadow: 0 1px 0 var(--gold);
 }
 
 .theme-toggle {
@@ -380,7 +383,7 @@ header input[type="search"]:focus-visible {
   width: 2.5rem;
   height: 2.5rem;
   padding: 0;
-  color: var(--ink);
+  color: var(--gold);
   cursor: pointer;
   background: var(--glass-strong);
   border: 1px solid var(--glass-edge);
@@ -405,7 +408,7 @@ header input[type="search"]:focus-visible {
   width: 2.5rem;
   height: 2.5rem;
   padding: 0;
-  color: var(--ink);
+  color: var(--gold);
   cursor: pointer;
   background: var(--glass-strong);
   border: 1px solid var(--glass-edge);
@@ -456,7 +459,7 @@ nav a:hover {
 nav a.active {
   color: var(--ink);
   background: var(--glass-strong);
-  border-color: var(--glass-edge);
+  border-color: var(--gold);
   box-shadow: var(--shadow-soft);
 }
 
@@ -536,7 +539,7 @@ input::placeholder {
   cursor: pointer;
   background: transparent;
   border: none;
-  border-bottom: 1px solid var(--input-edge);
+  border-bottom: 1px solid var(--gold);
   border-radius: 0;
 }
 
@@ -546,9 +549,9 @@ input::placeholder {
 }
 
 .genre-filter select:focus-visible {
-  border-bottom-color: var(--ink);
+  border-bottom-color: var(--gold);
   outline: none;
-  box-shadow: 0 1px 0 var(--ink);
+  box-shadow: 0 1px 0 var(--gold);
 }
 
 .art-list {
@@ -566,7 +569,7 @@ input::placeholder {
   margin: 0;
   padding: 0.75rem;
   background: var(--glass);
-  border: 1px solid var(--glass-edge);
+  border: 1px solid var(--gold);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
   transition:
@@ -660,7 +663,7 @@ input::placeholder {
   margin: 0 auto;
   padding: 1rem;
   background: var(--glass);
-  border: 1px solid var(--glass-edge);
+  border: 1px solid var(--gold);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
 }
@@ -793,7 +796,7 @@ main > a:hover {
   margin: 1.5rem 0 0.5rem;
   padding-top: 1rem;
   font-size: 1.2rem;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--gold);
 }
 
 .comments {
