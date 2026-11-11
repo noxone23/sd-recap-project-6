@@ -198,6 +198,117 @@ describe("Spotlight", () => {
     expect(screen.queryByText("Vincent van Gogh")).not.toBeInTheDocument();
   });
 
+  it("displays a button to show another art piece", () => {
+    mockRandom(0);
+
+    render(
+      <MemoryRouter>
+        <Spotlight
+          artPieces={artPieces}
+          isFavorite={() => false}
+          onToggleFavorite={() => {}}
+        />
+      </MemoryRouter>
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Show another" })
+    ).toBeInTheDocument();
+  });
+
+  it("shows another art piece with its image and artist when the button is clicked", async () => {
+    mockRandom(0);
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <Spotlight
+          artPieces={artPieces}
+          isFavorite={() => false}
+          onToggleFavorite={() => {}}
+        />
+      </MemoryRouter>
+    );
+
+    await user.click(screen.getByRole("button", { name: "Show another" }));
+
+    expect(
+      screen.getByRole("img", { name: "Wheat Field with Cypresses" })
+    ).toHaveAttribute("src", artPieces[1].imageSource);
+    expect(screen.getByText("Vincent van Gogh")).toBeInTheDocument();
+    expect(
+      screen.queryByText("Pieter Bruegel the Elder")
+    ).not.toBeInTheDocument();
+  });
+
+  it("never shows the same art piece again when the button is clicked", async () => {
+    mockRandom(0.5);
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <Spotlight
+          artPieces={artPieces}
+          isFavorite={() => false}
+          onToggleFavorite={() => {}}
+        />
+      </MemoryRouter>
+    );
+
+    for (let click = 0; click < 4; click++) {
+      const before = screen.getByRole("heading").textContent;
+
+      await user.click(screen.getByRole("button", { name: "Show another" }));
+
+      expect(screen.getByRole("heading").textContent).not.toBe(before);
+    }
+  });
+
+  it("does not display the button when there is only one art piece", () => {
+    mockRandom(0);
+
+    render(
+      <MemoryRouter>
+        <Spotlight
+          artPieces={[artPieces[0]]}
+          isFavorite={() => false}
+          onToggleFavorite={() => {}}
+        />
+      </MemoryRouter>
+    );
+
+    expect(
+      screen.queryByRole("button", { name: "Show another" })
+    ).not.toBeInTheDocument();
+  });
+
+  it("links to the details page and toggles the favorite of the art piece shown after the click", async () => {
+    mockRandom(0);
+    const onToggleFavorite = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <Spotlight
+          artPieces={artPieces}
+          isFavorite={() => false}
+          onToggleFavorite={onToggleFavorite}
+        />
+      </MemoryRouter>
+    );
+
+    await user.click(screen.getByRole("button", { name: "Show another" }));
+
+    expect(
+      screen.getByRole("link", { name: "Wheat Field with Cypresses" })
+    ).toHaveAttribute("href", "/art-pieces/wheat-field-with-cypresses");
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Favorite Wheat Field with Cypresses",
+      })
+    );
+
+    expect(onToggleFavorite).toHaveBeenCalledWith("wheat-field-with-cypresses");
+  });
+
   it("renders nothing when there are no art pieces", () => {
     const { container } = render(
       <MemoryRouter>

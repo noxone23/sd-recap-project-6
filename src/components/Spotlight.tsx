@@ -16,7 +16,7 @@ export default function Spotlight({
   isFavorite,
   onToggleFavorite,
 }: SpotlightProps) {
-  const [artPiece] = useState<ArtPiece | undefined>(() =>
+  const [artPiece, setArtPiece] = useState<ArtPiece | undefined>(() =>
     artPieces.length > 0 ? getRandomArtPiece(artPieces) : undefined
   );
 
@@ -36,6 +36,16 @@ export default function Spotlight({
       />
       <h2>{artPiece.name}</h2>
       <p>{artPiece.artist}</p>
+      {artPieces.length > 1 && (
+        <button
+          type="button"
+          onClick={() =>
+            setArtPiece((current) => getRandomArtPiece(artPieces, current))
+          }
+        >
+          Show another
+        </button>
+      )}
     </section>
   );
 }
