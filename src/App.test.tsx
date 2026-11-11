@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, useLocation, useNavigate } from "react-router";
 import { SWRConfig } from "swr";
@@ -87,6 +93,20 @@ describe("App", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows the details after clicking the image on the spotlight", async () => {
+    mockRandom(0.999);
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/");
+
+    await user.click(
+      await screen.findByRole("link", { name: "Wheat Field with Cypresses" })
+    );
+
+    expect(screen.getByText("1889")).toBeInTheDocument();
+    expect(screen.getByText("Post-Impressionism")).toBeInTheDocument();
+  });
+
   it("shows a loading message while the art pieces are loading", () => {
     vi.stubGlobal("fetch", vi.fn().mockReturnValue(new Promise(() => {})));
 
@@ -129,6 +149,39 @@ describe("App", () => {
 
     expect(screen.getAllByRole("listitem")).toHaveLength(2);
     expect(screen.getAllByRole("img")).toHaveLength(2);
+  });
+
+  it("shows the spotlight after clicking the page title", async () => {
+    mockRandom(0.999);
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces");
+    await screen.findAllByRole("listitem");
+
+    await user.click(
+      within(screen.getByRole("heading", { name: "Art Gallery" })).getByRole(
+        "link",
+        { name: "Art Gallery" }
+      )
+    );
+
+    expect(screen.getAllByRole("img")).toHaveLength(1);
+    expect(screen.queryByRole("list")).not.toBeInTheDocument();
+  });
+
+  it("keeps the link of the page title out of the tab order", () => {
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(new Promise(() => {})));
+
+    renderApp("/art-pieces");
+
+    expect(screen.getByRole("link", { name: "Art Gallery" })).toHaveAttribute(
+      "tabindex",
+      "-1"
+    );
+    expect(screen.getByRole("link", { name: "Art Gallery" })).toHaveAttribute(
+      "href",
+      "/"
+    );
   });
 
   it("shows the favorites page after clicking Favorites", async () => {
@@ -245,6 +298,43 @@ describe("App", () => {
     expect(screen.getAllByRole("listitem")).toHaveLength(2);
   });
 
+  it("shows the favorites after clicking Back on the details page opened from the favorites", async () => {
+    localStorage.setItem(
+      "art-pieces-info",
+      JSON.stringify([
+        { slug: "wheat-field-with-cypresses", isFavorite: true, comments: [] },
+      ])
+    );
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/favorites");
+
+    await user.click(
+      await screen.findByRole("link", { name: /Wheat Field with Cypresses/ })
+    );
+    await user.click(screen.getByRole("link", { name: "Back" }));
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+    expect(screen.getByText("Wheat Field with Cypresses")).toBeInTheDocument();
+    expect(screen.queryByText("The Harvesters")).not.toBeInTheDocument();
+  });
+
+  it("keeps the search after clicking Back on the details page opened from the gallery", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces?q=gogh");
+
+    await user.click(
+      await screen.findByRole("link", { name: /Wheat Field with Cypresses/ })
+    );
+    await user.click(screen.getByRole("link", { name: "Back" }));
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+    expect(screen.getByRole("searchbox", { name: "Search" })).toHaveValue(
+      "gogh"
+    );
+  });
+
   it("adds a comment to the art piece on the details page", async () => {
     mockArtPieces();
     const user = userEvent.setup();
@@ -336,6 +426,21 @@ describe("App", () => {
 
     expect(await screen.findByText("Art piece not found")).toBeInTheDocument();
   });
+
+  it.each(["/does-not-exist", "/art-pieces/unknown"])(
+    "links back to the gallery from the not found message on %s",
+    async (path) => {
+      mockArtPieces();
+      const user = userEvent.setup();
+      renderApp(path);
+
+      await user.click(
+        await screen.findByRole("link", { name: "Back to gallery" })
+      );
+
+      expect(screen.getAllByRole("listitem")).toHaveLength(2);
+    }
+  );
 
   it("marks an art piece as favorite after clicking its favorite button", async () => {
     mockArtPieces();
@@ -602,6 +707,63 @@ describe("App", () => {
     expect(screen.getAllByRole("listitem")).toHaveLength(1);
     expect(screen.getByText("Wheat Field with Cypresses")).toBeInTheDocument();
     expect(screen.queryByText("The Harvesters")).not.toBeInTheDocument();
+  });
+});
+
+describe("App page title", () => {
+  it.each([
+    ["/", "Art Gallery"],
+    ["/art-pieces", "Gallery – Art Gallery"],
+    ["/favorites", "Favorites – Art Gallery"],
+    ["/art-pieces/the-harvesters", "The Harvesters – Art Gallery"],
+    ["/art-pieces/unknown", "Art piece not found – Art Gallery"],
+    ["/does-not-exist", "Page not found – Art Gallery"],
+  ])("sets the document title on the route %s", async (path, title) => {
+    mockArtPieces();
+
+    renderApp(path);
+
+    await waitFor(() => expect(document.title).toBe(title));
+  });
+
+  it("keeps the app name as title while the art pieces are loading", () => {
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(new Promise(() => {})));
+
+    renderApp("/art-pieces/the-harvesters");
+
+    expect(document.title).toBe("Art Gallery");
+  });
+
+  it("keeps the app name as title when loading the art pieces fails", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: false, status: 500 })
+    );
+
+    renderApp("/art-pieces/the-harvesters");
+
+    await screen.findByText("Failed to load art pieces.");
+    expect(document.title).toBe("Art Gallery");
+  });
+
+  it("changes the document title when navigating to another page", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces");
+
+    await user.click(await screen.findByRole("link", { name: "Favorites" }));
+
+    expect(document.title).toBe("Favorites – Art Gallery");
+  });
+
+  it("restores the previous document title when the app is removed", () => {
+    document.title = "Before";
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(new Promise(() => {})));
+    const { unmount } = renderApp("/art-pieces");
+
+    unmount();
+
+    expect(document.title).toBe("Before");
   });
 });
 

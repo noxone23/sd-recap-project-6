@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 
 import type { ArtPiece, ArtPieceComment } from "../types";
 import ColorPalette from "./ColorPalette";
@@ -14,6 +14,14 @@ interface ArtPieceDetailsProps {
   onAddComment: (text: string) => void;
 }
 
+function getBackPath(state: unknown) {
+  const from = (state as { from?: unknown } | null)?.from;
+
+  return typeof from === "string" && /^\/(?![/\\])[^\t\r\n]*$/.test(from)
+    ? from
+    : "/art-pieces";
+}
+
 export default function ArtPieceDetails({
   artPiece,
   isFavorite,
@@ -21,9 +29,11 @@ export default function ArtPieceDetails({
   comments,
   onAddComment,
 }: ArtPieceDetailsProps) {
+  const { state } = useLocation();
+
   return (
     <section className="details">
-      <Link to="/art-pieces">Back</Link>
+      <Link to={getBackPath(state)}>Back</Link>
       <img src={artPiece.imageSource} alt={artPiece.name} />
       <FavoriteButton
         name={artPiece.name}

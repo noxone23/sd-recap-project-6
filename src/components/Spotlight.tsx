@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router";
 
 import { getRandomArtPiece } from "../getRandomArtPiece";
 import type { ArtPiece } from "../types";
@@ -25,12 +26,15 @@ export default function Spotlight({
 
   return (
     <section className="spotlight">
-      <img src={artPiece.imageSource} alt={artPiece.name} />
+      <Link to={`/art-pieces/${artPiece.slug}`}>
+        <img src={artPiece.imageSource} alt={artPiece.name} />
+      </Link>
       <FavoriteButton
         name={artPiece.name}
         isFavorite={isFavorite(artPiece.slug)}
         onToggle={() => onToggleFavorite(artPiece.slug)}
       />
+      <h2>{artPiece.name}</h2>
       <p>{artPiece.artist}</p>
     </section>
   );

@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter, Route, Routes, useLocation } from "react-router";
 
 import type { ArtPiece } from "../types";
 import ArtPiecePreview from "./ArtPiecePreview";
@@ -97,5 +97,38 @@ describe("ArtPiecePreview", () => {
     expect(
       screen.getByRole("link", { name: /The Harvesters/ })
     ).toHaveAttribute("href", "/art-pieces/the-harvesters");
+  });
+
+  it("passes the current path and search to the details page as state", async () => {
+    function StateDisplay() {
+      const { state } = useLocation() as { state: { from: string } };
+
+      return <p>Came from {state.from}</p>;
+    }
+
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter initialEntries={["/art-pieces?q=gogh"]}>
+        <Routes>
+          <Route
+            path="/art-pieces"
+            element={
+              <ArtPiecePreview
+                artPiece={artPiece}
+                isFavorite={false}
+                onToggleFavorite={() => {}}
+              />
+            }
+          />
+          <Route path="/art-pieces/:slug" element={<StateDisplay />} />
+        </Routes>
+      </MemoryRouter>
+    );
+
+    await user.click(screen.getByRole("link", { name: /The Harvesters/ }));
+
+    expect(
+      screen.getByText("Came from /art-pieces?q=gogh")
+    ).toBeInTheDocument();
   });
 });
