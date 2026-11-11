@@ -31,6 +31,22 @@ function renderDetails() {
   );
 }
 
+function renderDetailsWithState(state: unknown) {
+  return render(
+    <MemoryRouter
+      initialEntries={[{ pathname: "/art-pieces/the-harvesters", state }]}
+    >
+      <ArtPieceDetails
+        artPiece={artPiece}
+        isFavorite={false}
+        onToggleFavorite={() => {}}
+        comments={[]}
+        onAddComment={() => {}}
+      />
+    </MemoryRouter>
+  );
+}
+
 describe("ArtPieceDetails", () => {
   it("displays the image of the art piece", () => {
     renderDetails();
@@ -96,6 +112,28 @@ describe("ArtPieceDetails", () => {
 
   it("displays a back button that links to the list", () => {
     renderDetails();
+
+    expect(screen.getByRole("link", { name: "Back" })).toHaveAttribute(
+      "href",
+      "/art-pieces"
+    );
+  });
+
+  it("links the back button to the page the user came from", () => {
+    renderDetailsWithState({ from: "/favorites" });
+
+    expect(screen.getByRole("link", { name: "Back" })).toHaveAttribute(
+      "href",
+      "/favorites"
+    );
+  });
+
+  it.each([
+    ["is missing", null],
+    ["is not a path", { from: "https://example.com" }],
+    ["is not a text", { from: 42 }],
+  ])("links the back button to the list when the state %s", (_case, state) => {
+    renderDetailsWithState(state);
 
     expect(screen.getByRole("link", { name: "Back" })).toHaveAttribute(
       "href",

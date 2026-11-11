@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, useLocation } from "react-router";
 
 import type { ArtPiece } from "../types";
 import FavoriteButton from "./FavoriteButton";
@@ -14,9 +14,14 @@ export default function ArtPiecePreview({
   isFavorite,
   onToggleFavorite,
 }: ArtPiecePreviewProps) {
+  const { pathname, search } = useLocation();
+
   return (
     <li className="art-piece">
-      <Link to={`/art-pieces/${artPiece.slug}`}>
+      <Link
+        to={`/art-pieces/${artPiece.slug}`}
+        state={{ from: pathname + search }}
+      >
         <img src={artPiece.imageSource} alt={artPiece.name} />
         <h2>{artPiece.name}</h2>
       </Link>
