@@ -854,7 +854,7 @@ main > a:hover {
 
 @media (max-width: 40rem) {
   html {
-    scroll-padding-top: 10.75rem;
+    scroll-padding-top: 10rem;
   }
 
   .logo {
