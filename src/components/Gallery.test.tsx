@@ -26,12 +26,19 @@ const artPieces: ArtPiece[] = [
   },
 ];
 
-function renderGallery(query = "", onToggleFavorite = () => {}) {
+function renderGallery(
+  query = "",
+  onToggleFavorite = () => {},
+  genre = "",
+  onGenreChange: (genre: string) => void = () => {}
+) {
   return render(
     <MemoryRouter>
       <Gallery
         artPieces={artPieces}
         query={query}
+        genre={genre}
+        onGenreChange={onGenreChange}
         isFavorite={() => false}
         onToggleFavorite={onToggleFavorite}
       />
@@ -74,6 +81,60 @@ describe("Gallery", () => {
 
     expect(screen.getByRole("status")).toHaveTextContent("No art pieces found");
     expect(screen.queryByRole("listitem")).not.toBeInTheDocument();
+  });
+
+  it("has a genre control with All genres and the genres of the art pieces", () => {
+    renderGallery();
+
+    expect(screen.getByRole("combobox", { name: "Genre" })).toBeInTheDocument();
+    expect(
+      screen.getAllByRole("option").map((option) => option.textContent)
+    ).toEqual(["All genres", "Post-Impressionism", "Renaissance"]);
+  });
+
+  it("displays all art pieces when no genre is selected", () => {
+    renderGallery();
+
+    expect(screen.getByRole("combobox", { name: "Genre" })).toHaveValue("");
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+  });
+
+  it("displays only the art pieces of the selected genre", () => {
+    renderGallery("", () => {}, "Renaissance");
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+    expect(screen.getByText("The Harvesters")).toBeInTheDocument();
+    expect(
+      screen.queryByText("Wheat Field with Cypresses")
+    ).not.toBeInTheDocument();
+  });
+
+  it("displays only the art pieces that match the query and the genre", () => {
+    renderGallery("wheat", () => {}, "Renaissance");
+
+    expect(screen.getByRole("status")).toHaveTextContent("No art pieces found");
+    expect(screen.queryByRole("listitem")).not.toBeInTheDocument();
+  });
+
+  it("keeps the genre control when nothing matches", () => {
+    renderGallery("monet", () => {}, "Renaissance");
+
+    expect(screen.getByRole("combobox", { name: "Genre" })).toHaveValue(
+      "Renaissance"
+    );
+  });
+
+  it("calls onGenreChange with the selected genre", async () => {
+    const onGenreChange = vi.fn();
+    const user = userEvent.setup();
+    renderGallery("", () => {}, "", onGenreChange);
+
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Genre" }),
+      "Renaissance"
+    );
+
+    expect(onGenreChange).toHaveBeenCalledWith("Renaissance");
   });
 
   it("toggles the favorite of a found art piece by its slug", async () => {

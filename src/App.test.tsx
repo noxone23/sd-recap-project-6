@@ -57,6 +57,39 @@ function mockArtPieces() {
   );
 }
 
+function LocationDisplay() {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  return (
+    <>
+      <span data-testid="path">{location.pathname}</span>
+      <span data-testid="query">
+        {new URLSearchParams(location.search).get("q") ?? ""}
+      </span>
+      <span data-testid="search">{location.search}</span>
+      <button type="button" onClick={() => navigate(-1)}>
+        Go back
+      </button>
+    </>
+  );
+}
+
+function renderAppWithLocation(path: string) {
+  return render(
+    <SWRConfig value={{ provider: () => new Map() }}>
+      <MemoryRouter initialEntries={[path]}>
+        <App />
+        <LocationDisplay />
+      </MemoryRouter>
+    </SWRConfig>
+  );
+}
+
+function getSearchField() {
+  return screen.getByRole("searchbox", { name: "Search" });
+}
+
 afterEach(() => {
   localStorage.clear();
   vi.unstubAllGlobals();
@@ -888,39 +921,6 @@ describe("App theme", () => {
 });
 
 describe("App search in the header", () => {
-  function LocationDisplay() {
-    const location = useLocation();
-    const navigate = useNavigate();
-
-    return (
-      <>
-        <span data-testid="path">{location.pathname}</span>
-        <span data-testid="query">
-          {new URLSearchParams(location.search).get("q") ?? ""}
-        </span>
-        <span data-testid="search">{location.search}</span>
-        <button type="button" onClick={() => navigate(-1)}>
-          Go back
-        </button>
-      </>
-    );
-  }
-
-  function renderAppWithLocation(path: string) {
-    return render(
-      <SWRConfig value={{ provider: () => new Map() }}>
-        <MemoryRouter initialEntries={[path]}>
-          <App />
-          <LocationDisplay />
-        </MemoryRouter>
-      </SWRConfig>
-    );
-  }
-
-  function getSearchField() {
-    return screen.getByRole("searchbox", { name: "Search" });
-  }
-
   it.each([
     ["/"],
     ["/art-pieces"],
@@ -1263,5 +1263,210 @@ describe("App mouse trail", () => {
     const canvases = container.querySelectorAll("canvas");
     expect(canvases).toHaveLength(1);
     expect(canvases[0]).toHaveAttribute("inert");
+  });
+});
+
+describe("App genre filter in the Gallery", () => {
+  async function findGenreControl() {
+    return screen.findByRole("combobox", { name: "Genre" });
+  }
+
+  it("shows the genre control in the Gallery and not in the header", async () => {
+    mockArtPieces();
+
+    renderApp("/art-pieces");
+
+    const control = await findGenreControl();
+    expect(
+      within(screen.getByRole("main")).getByRole("combobox", { name: "Genre" })
+    ).toBe(control);
+    expect(
+      within(screen.getByRole("banner")).queryByRole("combobox")
+    ).not.toBeInTheDocument();
+  });
+
+  it("offers All genres and the genres of the art pieces", async () => {
+    mockArtPieces();
+
+    renderApp("/art-pieces");
+
+    await findGenreControl();
+    expect(
+      screen.getAllByRole("option").map((option) => option.textContent)
+    ).toEqual(["All genres", "Post-Impressionism", "Renaissance"]);
+  });
+
+  it("starts with All genres and shows all art pieces", async () => {
+    mockArtPieces();
+
+    renderApp("/art-pieces");
+
+    expect(await findGenreControl()).toHaveValue("");
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+  });
+
+  it("shows only the art pieces of the selected genre and puts it in the address", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderAppWithLocation("/art-pieces");
+
+    await user.selectOptions(await findGenreControl(), "Renaissance");
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+    expect(screen.getByText("The Harvesters")).toBeInTheDocument();
+    expect(screen.getByTestId("search")).toHaveTextContent(
+      "?genre=Renaissance"
+    );
+  });
+
+  it("shows all art pieces again and removes the genre from the address when All genres is selected", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderAppWithLocation("/art-pieces?genre=Renaissance");
+    const control = await findGenreControl();
+
+    await user.selectOptions(control, "All genres");
+
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+    expect(screen.getByTestId("search")).toBeEmptyDOMElement();
+  });
+
+  it("shows the control filled and the filtered list when the address has a genre", async () => {
+    mockArtPieces();
+
+    renderApp("/art-pieces?genre=Renaissance");
+
+    expect(await findGenreControl()).toHaveValue("Renaissance");
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+    expect(screen.getByText("The Harvesters")).toBeInTheDocument();
+  });
+
+  it("shows all art pieces when the genre of the address is unknown", async () => {
+    mockArtPieces();
+
+    renderApp("/art-pieces?genre=Unknown");
+
+    expect(await findGenreControl()).toHaveValue("");
+    expect(screen.getAllByRole("listitem")).toHaveLength(2);
+  });
+
+  it("shows only the art pieces that match the search and the genre", async () => {
+    mockArtPieces();
+
+    renderApp("/art-pieces?q=e&genre=Renaissance");
+
+    expect(await findGenreControl()).toHaveValue("Renaissance");
+    expect(getSearchField()).toHaveValue("e");
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+    expect(screen.getByText("The Harvesters")).toBeInTheDocument();
+  });
+
+  it("shows a message and keeps the genre control when nothing matches", async () => {
+    mockArtPieces();
+
+    renderApp("/art-pieces?q=gogh&genre=Renaissance");
+
+    expect(await screen.findByRole("status")).toHaveTextContent(
+      "No art pieces found"
+    );
+    expect(screen.getByRole("combobox", { name: "Genre" })).toHaveValue(
+      "Renaissance"
+    );
+  });
+
+  it("keeps the genre when the search text changes", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderAppWithLocation("/art-pieces?genre=Renaissance");
+    await findGenreControl();
+
+    await user.type(getSearchField(), "bruegel");
+
+    expect(screen.getByTestId("search")).toHaveTextContent(
+      "?q=bruegel&genre=Renaissance"
+    );
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+  });
+
+  it("keeps the genre when the search text is cleared", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderAppWithLocation("/art-pieces?q=bruegel&genre=Renaissance");
+    await findGenreControl();
+
+    await user.clear(getSearchField());
+
+    expect(screen.getByTestId("search")).toHaveTextContent(
+      "?genre=Renaissance"
+    );
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+  });
+
+  it("keeps the search text when the genre changes", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderAppWithLocation("/art-pieces?q=e");
+
+    await user.selectOptions(await findGenreControl(), "Post-Impressionism");
+
+    expect(screen.getByTestId("search")).toHaveTextContent(
+      "?q=e&genre=Post-Impressionism"
+    );
+    expect(getSearchField()).toHaveValue("e");
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+  });
+
+  it("returns to the filtered Gallery with Back on the details page", async () => {
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderApp("/art-pieces?genre=Renaissance");
+    await findGenreControl();
+
+    await user.click(screen.getByRole("link", { name: /The Harvesters/ }));
+    await user.click(screen.getByRole("link", { name: "Back" }));
+
+    expect(await findGenreControl()).toHaveValue("Renaissance");
+    expect(screen.getAllByRole("listitem")).toHaveLength(1);
+  });
+
+  it("does not filter the Favorites page by the genre of the address", async () => {
+    localStorage.setItem(
+      "art-pieces-info",
+      JSON.stringify([
+        { slug: "wheat-field-with-cypresses", isFavorite: true, comments: [] },
+      ])
+    );
+    mockArtPieces();
+
+    renderApp("/favorites?genre=Renaissance");
+
+    expect(await screen.findAllByRole("listitem")).toHaveLength(1);
+    expect(screen.getByText("Vincent van Gogh")).toBeInTheDocument();
+    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
+  });
+
+  it("shows no genre control on the Spotlight page", async () => {
+    mockRandom(0.999);
+    mockArtPieces();
+
+    renderApp("/?genre=Renaissance");
+
+    expect(
+      await screen.findByRole("img", { name: "Wheat Field with Cypresses" })
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
+  });
+
+  it("opens the Gallery without the genre when the search starts on another page", async () => {
+    mockRandom(0.999);
+    mockArtPieces();
+    const user = userEvent.setup();
+    renderAppWithLocation("/?genre=Renaissance");
+    await screen.findByRole("img", { name: "Wheat Field with Cypresses" });
+
+    await user.type(getSearchField(), "gogh");
+
+    expect(screen.getByTestId("search")).toHaveTextContent("?q=gogh");
+    expect(screen.getByTestId("search")).not.toHaveTextContent("genre");
   });
 });
