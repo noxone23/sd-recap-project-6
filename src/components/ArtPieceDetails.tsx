@@ -17,7 +17,7 @@ interface ArtPieceDetailsProps {
 function getBackPath(state: unknown) {
   const from = (state as { from?: unknown } | null)?.from;
 
-  return typeof from === "string" && /^\/(?![/\\])/.test(from)
+  return typeof from === "string" && /^\/(?![/\\])[^\t\r\n]*$/.test(from)
     ? from
     : "/art-pieces";
 }
