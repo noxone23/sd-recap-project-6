@@ -66,3 +66,7 @@ Changed:
 ## After approval
 
 Save the experiment (see question 1), create branch `feature/49-gold-accents` from `main`, save this plan as `docs/plans/49-gold-accents.md`, commit it. No implementation, no push, no PR.
+
+## Added after approval (found at the start of the implementation)
+
+The plan assumed that a test can read `src/styles.css` as text. In Vitest this does not work by default: CSS files are not processed, and `import css from "./styles.css?raw"` gives an empty text. Seven tests of `src/styles.test.ts` ("does not use gold for ...") passed only because of the empty text, which was noticed through a failing test for the focus ring. Decided with the user: one more line in the `test` block of `vite.config.ts`, `css: { include: [/styles\.css\?raw/] }`. The pattern matches only the raw import of the test, so `import "./styles.css"` in `App.tsx` stays unprocessed and the other tests are not affected. `vite.config.ts` is added to the list of changed files. A guard test checks that the imported text is not empty.
