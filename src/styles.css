@@ -792,7 +792,8 @@ main > a:hover {
   margin-top: 1rem;
 }
 
-.comment-form button {
+.comment-form button,
+.show-another {
   justify-self: start;
   padding: 0.6rem 1.25rem;
   font: inherit;
@@ -804,8 +805,15 @@ main > a:hover {
   transition: background-color var(--transition);
 }
 
-.comment-form button:hover {
+.comment-form button:hover,
+.show-another:hover {
   background: var(--button-hover);
+}
+
+.show-another {
+  padding: 0.4rem 0.9rem;
+  margin: 0.5rem 0.25rem 0.25rem;
+  font-size: 0.9rem;
 }
 
 @media (max-width: 40rem) {

@@ -66,4 +66,39 @@ describe("getRandomArtPiece", () => {
 
     expect(getRandomArtPiece([artPieces[0]])).toBe(artPieces[0]);
   });
+
+  it.each([0, 0.5, 0.999])(
+    "never returns the excluded art piece when the random value is %s",
+    (fraction) => {
+      mockRandom(fraction);
+
+      for (const excluded of artPieces) {
+        expect(getRandomArtPiece(artPieces, excluded)).not.toBe(excluded);
+      }
+    }
+  );
+
+  it("picks from the art pieces without the excluded one", () => {
+    mockRandom(0);
+    expect(getRandomArtPiece(artPieces, artPieces[0])).toBe(artPieces[1]);
+
+    mockRandom(0.999);
+    expect(getRandomArtPiece(artPieces, artPieces[2])).toBe(artPieces[1]);
+  });
+
+  it("picks from all art pieces when the excluded one is not in the list", () => {
+    const other: ArtPiece = { ...artPieces[0], slug: "not-in-the-list" };
+
+    mockRandom(0);
+    expect(getRandomArtPiece(artPieces, other)).toBe(artPieces[0]);
+
+    mockRandom(0.999);
+    expect(getRandomArtPiece(artPieces, other)).toBe(artPieces[2]);
+  });
+
+  it("returns the only art piece when it is the excluded one", () => {
+    mockRandom(0.5);
+
+    expect(getRandomArtPiece([artPieces[0]], artPieces[0])).toBe(artPieces[0]);
+  });
 });
