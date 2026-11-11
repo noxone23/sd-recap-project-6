@@ -86,6 +86,16 @@ describe("getRandomArtPiece", () => {
     expect(getRandomArtPiece(artPieces, artPieces[2])).toBe(artPieces[1]);
   });
 
+  it("picks from all art pieces when the excluded one is not in the list", () => {
+    const other: ArtPiece = { ...artPieces[0], slug: "not-in-the-list" };
+
+    mockRandom(0);
+    expect(getRandomArtPiece(artPieces, other)).toBe(artPieces[0]);
+
+    mockRandom(0.999);
+    expect(getRandomArtPiece(artPieces, other)).toBe(artPieces[2]);
+  });
+
   it("returns the only art piece when it is the excluded one", () => {
     mockRandom(0.5);
 
