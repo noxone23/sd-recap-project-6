@@ -97,9 +97,9 @@ export default function App() {
   const query = isGallery ? (searchParams.get("q") ?? "") : "";
   const requestedGenre = isGallery ? (searchParams.get("genre") ?? "") : "";
   const genre =
-    artPieces && getGenres(artPieces).includes(requestedGenre)
-      ? requestedGenre
-      : "";
+    artPieces && !getGenres(artPieces).includes(requestedGenre)
+      ? ""
+      : requestedGenre;
 
   function handleSearch(value: string) {
     if (isGallery) {

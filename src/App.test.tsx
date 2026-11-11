@@ -1469,4 +1469,16 @@ describe("App genre filter in the Gallery", () => {
     expect(screen.getByTestId("search")).toHaveTextContent("?q=gogh");
     expect(screen.getByTestId("search")).not.toHaveTextContent("genre");
   });
+
+  it("keeps the genre of the address when the search text changes while the art pieces are loading", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockReturnValue(new Promise(() => {})));
+    const user = userEvent.setup();
+    renderAppWithLocation("/art-pieces?genre=Renaissance");
+
+    await user.type(getSearchField(), "bruegel");
+
+    expect(screen.getByTestId("search")).toHaveTextContent(
+      "?q=bruegel&genre=Renaissance"
+    );
+  });
 });
