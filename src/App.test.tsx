@@ -1262,6 +1262,6 @@ describe("App mouse trail", () => {
 
     const canvases = container.querySelectorAll("canvas");
     expect(canvases).toHaveLength(1);
-    expect(canvases[0]).toHaveAttribute("aria-hidden", "true");
+    expect(canvases[0]).toHaveAttribute("inert");
   });
 });
