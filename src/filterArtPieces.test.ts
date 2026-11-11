@@ -49,4 +49,30 @@ describe("filterArtPieces", () => {
   ])("returns all art pieces when the text is %s", (_description, query) => {
     expect(filterArtPieces(artPieces, query)).toEqual(artPieces);
   });
+
+  it("keeps only the art pieces of the genre", () => {
+    expect(filterArtPieces(artPieces, "", "Renaissance")).toEqual([
+      artPieces[0],
+    ]);
+  });
+
+  it("returns all art pieces when the genre is empty", () => {
+    expect(filterArtPieces(artPieces, "", "")).toEqual(artPieces);
+  });
+
+  it("returns no art pieces when no art piece has the genre", () => {
+    expect(filterArtPieces(artPieces, "", "Baroque")).toEqual([]);
+  });
+
+  it("keeps the art pieces that match the text and the genre", () => {
+    expect(filterArtPieces(artPieces, "e", "Post-Impressionism")).toEqual([
+      artPieces[1],
+    ]);
+  });
+
+  it("returns no art pieces when the text matches only another genre", () => {
+    expect(filterArtPieces(artPieces, "bruegel", "Post-Impressionism")).toEqual(
+      []
+    );
+  });
 });
