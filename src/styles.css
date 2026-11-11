@@ -811,7 +811,9 @@ main > a:hover {
 }
 
 .show-another {
+  padding: 0.4rem 0.9rem;
   margin: 0.5rem 0.25rem 0.25rem;
+  font-size: 0.9rem;
 }
 
 @media (max-width: 40rem) {
