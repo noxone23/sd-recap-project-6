@@ -2,12 +2,15 @@ import type { ArtPiece } from "./types";
 
 export function filterArtPieces(
   artPieces: ArtPiece[],
-  query: string
+  query: string,
+  genre = ""
 ): ArtPiece[] {
   const text = query.trim().toLowerCase();
 
   return artPieces.filter(
-    ({ name, artist }) =>
-      name.toLowerCase().includes(text) || artist.toLowerCase().includes(text)
+    (artPiece) =>
+      (genre === "" || artPiece.genre === genre) &&
+      (artPiece.name.toLowerCase().includes(text) ||
+        artPiece.artist.toLowerCase().includes(text))
   );
 }

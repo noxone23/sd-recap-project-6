@@ -23,6 +23,7 @@ import SearchField from "./components/SearchField";
 import Spotlight from "./components/Spotlight";
 import ThemeToggle from "./components/ThemeToggle";
 import { fetcher } from "./fetcher";
+import { getGenres } from "./getGenres";
 import { APP_TITLE, getPageTitle } from "./getPageTitle";
 import "./styles.css";
 import { getInitialTheme, saveTheme } from "./theme";
@@ -30,6 +31,20 @@ import type { Theme } from "./theme";
 import type { ArtPiece, ArtPieceComment, ArtPieceInfo } from "./types";
 
 const API_URL = "https://example-apis.vercel.app/api/art";
+
+function createGallerySearchParams(query: string, genre: string) {
+  const params = new URLSearchParams();
+
+  if (query) {
+    params.set("q", query);
+  }
+
+  if (genre) {
+    params.set("genre", genre);
+  }
+
+  return params;
+}
 
 interface ArtPieceDetailsRouteProps {
   artPieces: ArtPiece[];
@@ -80,16 +95,29 @@ export default function App() {
   const isGallery =
     location.pathname === "/art-pieces" || location.pathname === "/art-pieces/";
   const query = isGallery ? (searchParams.get("q") ?? "") : "";
+  const requestedGenre = isGallery ? (searchParams.get("genre") ?? "") : "";
+  const genre =
+    artPieces && !getGenres(artPieces).includes(requestedGenre)
+      ? ""
+      : requestedGenre;
 
   function handleSearch(value: string) {
     if (isGallery) {
-      setSearchParams(value ? { q: value } : {}, { replace: true });
+      setSearchParams(createGallerySearchParams(value, genre), {
+        replace: true,
+      });
     } else if (value) {
       void navigate({
         pathname: "/art-pieces",
         search: `?${new URLSearchParams({ q: value })}`,
       });
     }
+  }
+
+  function handleGenreChange(value: string) {
+    setSearchParams(createGallerySearchParams(query, value), {
+      replace: true,
+    });
   }
 
   useEffect(() => {
@@ -191,6 +219,8 @@ export default function App() {
             <Gallery
               artPieces={artPieces}
               query={query}
+              genre={genre}
+              onGenreChange={handleGenreChange}
               isFavorite={isFavorite}
               onToggleFavorite={toggleFavorite}
             />
