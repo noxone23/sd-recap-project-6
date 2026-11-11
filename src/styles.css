@@ -515,6 +515,35 @@ input::placeholder {
   opacity: 1;
 }
 
+.genre-filter {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.genre-filter select {
+  padding: 0.35rem 0.25rem;
+  font: inherit;
+  color: var(--ink);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--input-edge);
+  border-radius: 0;
+}
+
+.genre-filter option {
+  color: var(--ink);
+  background: var(--wall);
+}
+
+.genre-filter select:focus-visible {
+  border-bottom-color: var(--ink);
+  outline: none;
+  box-shadow: 0 1px 0 var(--ink);
+}
+
 .art-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
