@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import {
+  Link,
   Route,
   Routes,
   useLocation,
@@ -17,10 +18,12 @@ import BackToTop from "./components/BackToTop";
 import Gallery from "./components/Gallery";
 import MouseTrail from "./components/MouseTrail";
 import Navigation from "./components/Navigation";
+import NotFound from "./components/NotFound";
 import SearchField from "./components/SearchField";
 import Spotlight from "./components/Spotlight";
 import ThemeToggle from "./components/ThemeToggle";
 import { fetcher } from "./fetcher";
+import { APP_TITLE, getPageTitle } from "./getPageTitle";
 import "./styles.css";
 import { getInitialTheme, saveTheme } from "./theme";
 import type { Theme } from "./theme";
@@ -47,7 +50,7 @@ function ArtPieceDetailsRoute({
   const artPiece = artPieces.find((piece) => piece.slug === slug);
 
   if (!artPiece) {
-    return <p>Art piece not found</p>;
+    return <NotFound message="Art piece not found" />;
   }
 
   return (
@@ -96,6 +99,20 @@ export default function App() {
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
   }, [theme]);
+
+  const pageTitle = artPieces
+    ? getPageTitle(location.pathname, artPieces)
+    : APP_TITLE;
+
+  useEffect(() => {
+    const previousTitle = document.title;
+
+    document.title = pageTitle;
+
+    return () => {
+      document.title = previousTitle;
+    };
+  }, [pageTitle]);
 
   const titleRef = useRef<HTMLHeadingElement>(null);
 
@@ -205,7 +222,7 @@ export default function App() {
             )
           }
         />
-        <Route path="*" element={<p>Page not found</p>} />
+        <Route path="*" element={<NotFound message="Page not found" />} />
       </Routes>
     );
   }
@@ -214,7 +231,9 @@ export default function App() {
     <>
       <header>
         <h1 ref={titleRef} tabIndex={-1}>
-          Art Gallery
+          <Link to="/" tabIndex={-1}>
+            Art Gallery
+          </Link>
         </h1>
         <SearchField value={query} onChange={handleSearch} />
         <ThemeToggle theme={theme} onToggle={toggleTheme} />

@@ -318,6 +318,10 @@ header h1 {
   font-size: 1.6rem;
 }
 
+header h1 a {
+  text-decoration: none;
+}
+
 header label {
   position: absolute;
   width: 1px;
@@ -692,7 +696,8 @@ input::placeholder {
   top: 4.4rem;
 }
 
-.details > a {
+.details > a,
+main > a {
   display: inline-flex;
   gap: 0.4rem;
   align-items: center;
@@ -706,11 +711,19 @@ input::placeholder {
   transition: background-color var(--transition);
 }
 
-.details > a::before {
+main > a {
+  display: flex;
+  width: fit-content;
+  margin: 0 auto 0.75rem;
+}
+
+.details > a::before,
+main > a::before {
   content: "←" / "";
 }
 
-.details > a:hover {
+.details > a:hover,
+main > a:hover {
   background: var(--solid-hover);
 }
 

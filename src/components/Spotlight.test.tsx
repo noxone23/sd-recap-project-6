@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router";
 
 import type { ArtPiece } from "../types";
 import Spotlight from "./Spotlight";
@@ -41,26 +42,66 @@ describe("Spotlight", () => {
     mockRandom(0);
 
     render(
-      <Spotlight
-        artPieces={artPieces}
-        isFavorite={() => false}
-        onToggleFavorite={() => {}}
-      />
+      <MemoryRouter>
+        <Spotlight
+          artPieces={artPieces}
+          isFavorite={() => false}
+          onToggleFavorite={() => {}}
+        />
+      </MemoryRouter>
     );
 
     const image = screen.getByRole("img", { name: "The Harvesters" });
     expect(image).toHaveAttribute("src", artPieces[0].imageSource);
   });
 
+  it("links the image to the details page of the selected art piece", () => {
+    mockRandom(0.999);
+
+    render(
+      <MemoryRouter>
+        <Spotlight
+          artPieces={artPieces}
+          isFavorite={() => false}
+          onToggleFavorite={() => {}}
+        />
+      </MemoryRouter>
+    );
+
+    expect(
+      screen.getByRole("link", { name: "Wheat Field with Cypresses" })
+    ).toHaveAttribute("href", "/art-pieces/wheat-field-with-cypresses");
+  });
+
+  it("displays the name of the selected art piece as a heading", () => {
+    mockRandom(0.999);
+
+    render(
+      <MemoryRouter>
+        <Spotlight
+          artPieces={artPieces}
+          isFavorite={() => false}
+          onToggleFavorite={() => {}}
+        />
+      </MemoryRouter>
+    );
+
+    expect(
+      screen.getByRole("heading", { name: "Wheat Field with Cypresses" })
+    ).toBeInTheDocument();
+  });
+
   it("displays the name of the artist of the selected art piece", () => {
     mockRandom(0.999);
 
     render(
-      <Spotlight
-        artPieces={artPieces}
-        isFavorite={() => false}
-        onToggleFavorite={() => {}}
-      />
+      <MemoryRouter>
+        <Spotlight
+          artPieces={artPieces}
+          isFavorite={() => false}
+          onToggleFavorite={() => {}}
+        />
+      </MemoryRouter>
     );
 
     expect(screen.getByText("Vincent van Gogh")).toBeInTheDocument();
@@ -70,11 +111,13 @@ describe("Spotlight", () => {
     mockRandom(0.999);
 
     render(
-      <Spotlight
-        artPieces={artPieces}
-        isFavorite={() => false}
-        onToggleFavorite={() => {}}
-      />
+      <MemoryRouter>
+        <Spotlight
+          artPieces={artPieces}
+          isFavorite={() => false}
+          onToggleFavorite={() => {}}
+        />
+      </MemoryRouter>
     );
 
     expect(
@@ -88,11 +131,13 @@ describe("Spotlight", () => {
     mockRandom(0.999);
 
     render(
-      <Spotlight
-        artPieces={artPieces}
-        isFavorite={(slug) => slug === "wheat-field-with-cypresses"}
-        onToggleFavorite={() => {}}
-      />
+      <MemoryRouter>
+        <Spotlight
+          artPieces={artPieces}
+          isFavorite={(slug) => slug === "wheat-field-with-cypresses"}
+          onToggleFavorite={() => {}}
+        />
+      </MemoryRouter>
     );
 
     expect(
@@ -107,11 +152,13 @@ describe("Spotlight", () => {
     const onToggleFavorite = vi.fn();
     const user = userEvent.setup();
     render(
-      <Spotlight
-        artPieces={artPieces}
-        isFavorite={() => false}
-        onToggleFavorite={onToggleFavorite}
-      />
+      <MemoryRouter>
+        <Spotlight
+          artPieces={artPieces}
+          isFavorite={() => false}
+          onToggleFavorite={onToggleFavorite}
+        />
+      </MemoryRouter>
     );
 
     await user.click(
@@ -127,20 +174,24 @@ describe("Spotlight", () => {
   it("keeps the same art piece when it renders again", () => {
     mockRandom(0);
     const { rerender } = render(
-      <Spotlight
-        artPieces={artPieces}
-        isFavorite={() => false}
-        onToggleFavorite={() => {}}
-      />
+      <MemoryRouter>
+        <Spotlight
+          artPieces={artPieces}
+          isFavorite={() => false}
+          onToggleFavorite={() => {}}
+        />
+      </MemoryRouter>
     );
 
     mockRandom(0.999);
     rerender(
-      <Spotlight
-        artPieces={artPieces}
-        isFavorite={() => false}
-        onToggleFavorite={() => {}}
-      />
+      <MemoryRouter>
+        <Spotlight
+          artPieces={artPieces}
+          isFavorite={() => false}
+          onToggleFavorite={() => {}}
+        />
+      </MemoryRouter>
     );
 
     expect(screen.getByText("Pieter Bruegel the Elder")).toBeInTheDocument();
@@ -149,11 +200,13 @@ describe("Spotlight", () => {
 
   it("renders nothing when there are no art pieces", () => {
     const { container } = render(
-      <Spotlight
-        artPieces={[]}
-        isFavorite={() => false}
-        onToggleFavorite={() => {}}
-      />
+      <MemoryRouter>
+        <Spotlight
+          artPieces={[]}
+          isFavorite={() => false}
+          onToggleFavorite={() => {}}
+        />
+      </MemoryRouter>
     );
 
     expect(container).toBeEmptyDOMElement();
