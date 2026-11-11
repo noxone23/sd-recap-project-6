@@ -107,7 +107,9 @@ describe("App", () => {
 
     expect(await screen.findByText("The Harvesters")).toBeInTheDocument();
     expect(screen.getByText("Vincent van Gogh")).toBeInTheDocument();
-    expect(screen.getAllByRole("img")).toHaveLength(2);
+    expect(within(screen.getByRole("main")).getAllByRole("img")).toHaveLength(
+      2
+    );
   });
 
   it("shows the spotlight on the route /", async () => {
@@ -120,7 +122,9 @@ describe("App", () => {
     renderApp("/");
 
     expect(await screen.findByText("Vincent van Gogh")).toBeInTheDocument();
-    expect(screen.getAllByRole("img")).toHaveLength(1);
+    expect(within(screen.getByRole("main")).getAllByRole("img")).toHaveLength(
+      1
+    );
     expect(
       screen.getByRole("img", { name: "Wheat Field with Cypresses" })
     ).toBeInTheDocument();
@@ -169,7 +173,9 @@ describe("App", () => {
 
     await user.click(await screen.findByRole("link", { name: "Spotlight" }));
 
-    expect(screen.getAllByRole("img")).toHaveLength(1);
+    expect(within(screen.getByRole("main")).getAllByRole("img")).toHaveLength(
+      1
+    );
     expect(screen.queryByRole("list")).not.toBeInTheDocument();
   });
 
@@ -181,7 +187,9 @@ describe("App", () => {
     await user.click(await screen.findByRole("link", { name: "Gallery" }));
 
     expect(screen.getAllByRole("listitem")).toHaveLength(2);
-    expect(screen.getAllByRole("img")).toHaveLength(2);
+    expect(within(screen.getByRole("main")).getAllByRole("img")).toHaveLength(
+      2
+    );
   });
 
   it("shows the spotlight after clicking the page title", async () => {
@@ -198,7 +206,9 @@ describe("App", () => {
       )
     );
 
-    expect(screen.getAllByRole("img")).toHaveLength(1);
+    expect(within(screen.getByRole("main")).getAllByRole("img")).toHaveLength(
+      1
+    );
     expect(screen.queryByRole("list")).not.toBeInTheDocument();
   });
 
@@ -291,7 +301,9 @@ describe("App", () => {
     expect(screen.getByText("Pieter Bruegel the Elder")).toBeInTheDocument();
     expect(screen.getByText("1565")).toBeInTheDocument();
     expect(screen.getByText("Renaissance")).toBeInTheDocument();
-    expect(screen.getAllByRole("img")).toHaveLength(1);
+    expect(within(screen.getByRole("main")).getAllByRole("img")).toHaveLength(
+      1
+    );
   });
 
   it("shows the color palette of the art piece on the details page", async () => {
