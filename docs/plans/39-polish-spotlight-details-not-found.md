@@ -42,6 +42,12 @@ Changed:
 
 Titles: `Art Gallery` (Spotlight, loading, error), `Gallery – Art Gallery`, `Favorites – Art Gallery`, `<Name> – Art Gallery`, `Art piece not found – Art Gallery`, `Page not found – Art Gallery`.
 
+## Added after approval (requested during the review)
+
+- `src/App.tsx` (+ `App.test.tsx`): the header title "Art Gallery" is a `Link` to `/` with `tabIndex={-1}`, so the tab order (search, theme toggle, navigation) stays the same. Tests: click leads to the Spotlight; the link has `href="/"` and `tabindex="-1"`.
+- `src/styles.css`: "Back to gallery" gets the button style of "Back" (`main > a` next to `.details > a`); the header title link has no underline.
+- Both back elements stay links with a button look (not real buttons), so no existing test changes.
+
 ## Out of scope
 
 - `<dl>` for year/genre/artist, order of `<h2>` and image on the details page, `loading="lazy"`, `revalidateOnFocus`.
