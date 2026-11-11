@@ -39,6 +39,7 @@ export default function Spotlight({
       {artPieces.length > 1 && (
         <button
           type="button"
+          className="show-another"
           onClick={() =>
             setArtPiece((current) => getRandomArtPiece(artPieces, current))
           }
